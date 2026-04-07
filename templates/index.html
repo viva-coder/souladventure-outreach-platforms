@@ -91,23 +91,35 @@
   #filters {
     position: fixed; top: 118px; left: 50%; transform: translateX(-50%);
     z-index: 100;
-    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
   }
   .pill {
-    padding: 4px 12px; border-radius: 2px;
+    padding: 6px 14px; border-radius: 2px;
     font-family: 'DM Mono', monospace; font-size: 9px;
     letter-spacing: 0.15em; text-transform: uppercase;
     cursor: pointer; border: 1px solid transparent;
-    transition: all 0.2s; user-select: none;
+    transition: all 0.3s;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.02);
   }
-  .pill.active, .pill:hover { border-color: currentColor; }
+  .pill:hover { border-color: currentColor; background: rgba(255, 255, 255, 0.05); }
+  
+  /* ACTIVE GLOW EFFECT */
+  .pill.active { 
+    background: rgba(255, 255, 255, 0.12); 
+    border-color: currentColor; 
+    box-shadow: 0 0 15px currentColor;
+    color: var(--text-bright) !important;
+  }
+
+  /* PILL COLORS */
   .pill[data-cat="all"] { color: var(--gold); }
   .pill[data-cat="platform"] { color: var(--teal); }
-  .pill[data-cat="fb_general"] { color: var(--lime); }
-  .pill[data-cat="fb_nsw"] { color: var(--rose); }
-  .pill[data-cat="fb_qld"] { color: var(--amber); }
-  .pill[data-cat="fb_vic"] { color: var(--lavender); }
-  .pill[data-cat="fb_other"] { color: var(--sky); }
+  .pill[data-cat="general"] { color: var(--lime); }
+  .pill[data-cat="nsw"] { color: var(--rose); }
+  .pill[data-cat="qld"] { color: var(--amber); }
+  .pill[data-cat="vic"] { color: var(--lavender); }
+  .pill[data-cat="other"] { color: var(--sky); }
 
   /* LEGEND */
   #legend {
@@ -213,11 +225,11 @@
 <div id="filters">
   <div class="pill active" data-cat="all">All</div>
   <div class="pill" data-cat="platform">Platforms</div>
-  <div class="pill" data-cat="fb_general">General</div>
-  <div class="pill" data-cat="fb_nsw">NSW</div>
-  <div class="pill" data-cat="fb_qld">QLD</div>
-  <div class="pill" data-cat="fb_vic">VIC</div>
-  <div class="pill" data-cat="fb_other">Other States</div>
+  <div class="pill" data-cat="general">General</div>
+  <div class="pill" data-cat="nsw">NSW</div>
+  <div class="pill" data-cat="qld">QLD</div>
+  <div class="pill" data-cat="vic">VIC</div>
+  <div class="pill" data-cat="other">Other States</div>
 </div>
 
 <div id="graph-container"><svg id="graph"></svg></div>
@@ -241,11 +253,11 @@
       <label>Category</label>
       <select id="field-category">
         <option value="platform">Platform</option>
-        <option value="fb_general">FB Group — General</option>
-        <option value="fb_nsw">FB Group — NSW</option>
-        <option value="fb_qld">FB Group — QLD</option>
-        <option value="fb_vic">FB Group — VIC</option>
-        <option value="fb_other">FB Group — Other</option>
+        <option value="general">FB Group — General</option>
+        <option value="nsw">FB Group — NSW</option>
+        <option value="qld">FB Group — QLD</option>
+        <option value="vic">FB Group — VIC</option>
+        <option value="other">FB Group — Other</option>
       </select>
     </div>
     <div class="panel-field"><label>URL</label><input type="url" id="field-url"/></div>
@@ -264,7 +276,7 @@
 <div id="toast"></div>
 
 <script>
-const COLOR = { center: '#c9a96e', platform: '#4db89e', fb_general: '#7db87a', fb_nsw: '#d4748a', fb_qld: '#d4a04a', fb_vic: '#9b7fd4', fb_other: '#5aaccf' };
+const COLOR = { center: '#c9a96e', platform: '#4db89e', general: '#7db87a', nsw: '#d4748a', qld: '#d4a04a', vic: '#9b7fd4', other: '#5aaccf' };
 let allNodes = [], simulation, svg, g, linkSel, nodeSel, activeFilter = 'all', searchTerm = '';
 
 async function loadNodes() {
@@ -279,7 +291,7 @@ async function loadNodes() {
 function updateStats() {
   document.getElementById('stat-nodes').textContent = allNodes.length + 1;
   document.getElementById('stat-platforms').textContent = allNodes.filter(n => n.category === 'platform').length;
-  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category.startsWith('fb_')).length;
+  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category !== 'platform' && n.category !== 'center').length;
 }
 
 function buildGraph() {
@@ -310,8 +322,8 @@ function buildGraph() {
     .on('mouseover', (e, d) => { if(d.id !== 'center') showTooltip(e, d); })
     .on('mouseout', hideTooltip);
 
-  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category]);
-  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category]).text(d => d.name).style('font-size', '10px');
+  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category] || '#666');
+  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category] || '#666').text(d => d.name).style('font-size', '10px');
 
   simulation.on('tick', () => {
     linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
@@ -327,6 +339,7 @@ function openPanel(d) {
   document.getElementById('field-url').value = d.url || '';
   document.getElementById('field-members').value = d.members || '';
   document.getElementById('field-notes').value = d.notes || '';
+  document.getElementById('btn-link').href = d.url || '#';
   document.getElementById('panel').classList.add('open');
 }
 
@@ -339,8 +352,8 @@ document.getElementById('btn-save').onclick = async () => {
     members: document.getElementById('field-members').value,
     notes: document.getElementById('field-notes').value
   };
-  const method = id && id !== 'undefined' ? 'PUT' : 'POST';
-  const url = id && id !== 'undefined' ? `/api/nodes/${id}` : '/api/nodes';
+  const method = id && id !== '' ? 'PUT' : 'POST';
+  const url = id && id !== '' ? `/api/nodes/${id}` : '/api/nodes';
   await fetch(url, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
   document.getElementById('panel').classList.remove('open');
   loadNodes();
@@ -348,7 +361,7 @@ document.getElementById('btn-save').onclick = async () => {
 
 document.getElementById('btn-delete').onclick = async () => {
   const id = document.getElementById('field-id').value;
-  if(confirm('Delete?')) {
+  if(id && confirm('Delete?')) {
     await fetch(`/api/nodes/${id}`, { method: 'DELETE' });
     document.getElementById('panel').classList.remove('open');
     loadNodes();
@@ -358,15 +371,20 @@ document.getElementById('btn-delete').onclick = async () => {
 document.getElementById('add-btn').onclick = () => {
   document.getElementById('field-id').value = '';
   document.getElementById('field-name').value = '';
+  document.getElementById('field-category').value = 'general';
   document.getElementById('panel-title').textContent = 'New Node';
   document.getElementById('panel').classList.add('open');
 };
 
 document.getElementById('search-input').oninput = e => { searchTerm = e.target.value; buildGraph(); };
+document.getElementById('search-clear').onclick = () => { document.getElementById('search-input').value = ''; searchTerm = ''; buildGraph(); };
 document.getElementById('panel-close').onclick = () => document.getElementById('panel').classList.remove('open');
+
 document.querySelectorAll('.pill').forEach(p => p.onclick = () => { 
   document.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
-  p.classList.add('active'); activeFilter = p.dataset.cat; buildGraph(); 
+  p.classList.add('active'); 
+  activeFilter = p.dataset.cat; 
+  buildGraph(); 
 });
 
 function dragStarted(e, d) { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
