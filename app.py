@@ -3,8 +3,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, jsonify
 from flask_basicauth import BasicAuth
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Security & DB Config
 app.config['BASIC_AUTH_USERNAME'] = os.environ.get('WEB_USER', 'admin')
@@ -19,10 +21,16 @@ def get_db():
     return psycopg2.connect(url, cursor_factory=RealDictCursor)
 
 def sync_vault():
-    """Scans the folder structure and updates Postgres with smart matching."""
+    """Wipes the old table, recreates it with logo_path, and scans folders."""
+    print("--- Starting Database Sync ---")
     conn = get_db()
     cur = conn.cursor()
     
+    # 1. FORCE RESET: This fixes the 'logo_path' missing error
+    print("Resetting 'nodes' table to fix schema...")
+    cur.execute("DROP TABLE IF EXISTS nodes CASCADE;") 
+    
+    # 2. CREATE NEW TABLE: With the correct columns
     cur.execute("""
         CREATE TABLE IF NOT EXISTS nodes (
             id SERIAL PRIMARY KEY,
@@ -32,22 +40,18 @@ def sync_vault():
         );
     """)
 
-    # We map potential folder names to clear Categories
+    # 3. FOLDER MAPPING: Matches your GitHub structure exactly
     mapping = {
         '01_FB_Groups/NSW': 'NSW',
-        '01_FB_Groups/nsw': 'NSW',
         '01_FB_Groups/QLD': 'QLD',
-        '01_FB_Groups/qld': 'QLD',
         '01_FB_Groups/VIC': 'VIC',
-        '01_FB_Groups/vic': 'VIC',
         '01_FB_Groups/General_and_Niche': 'General',
         '01_FB_Groups/Other_States': 'Other',
         '02_Platforms': 'Platform',
         '02_platforms': 'Platform'
     }
 
-    print("--- Starting Smart Vault Sync ---")
-    
+    # 4. SCAN FOLDERS
     for folder_rel, cat_label in mapping.items():
         if os.path.exists(folder_rel):
             print(f"Found folder: {folder_rel}")
@@ -55,12 +59,9 @@ def sync_vault():
                 if filename.endswith(".md"):
                     node_name = filename.replace(".md", "")
                     
-                    # Smart Logo Search: Looks for "Name.jpg" or "Namelogo.jpg"
+                    # Logic: Looks for "Name.jpg" or "Namelogo.jpg"
                     logo_file = f"{node_name}.jpg"
-                    if not os.path.exists(f"static/{logo_file}"):
-                        alt_logo = f"{node_name}logo.jpg".replace(" ", "")
-                        logo_file = alt_logo if os.path.exists(f"static/{alt_logo}") else logo_file
-
+                    
                     cur.execute("""
                         INSERT INTO nodes (name, category, logo_path)
                         VALUES (%s, %s, %s)
@@ -81,22 +82,26 @@ def index():
 
 @app.route('/api/data')
 def get_data():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT name, category, logo_path FROM nodes")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    
-    nodes = [{"id": "SoulAdventure", "group": "Center"}]
-    links = []
-    
-    for r in rows:
-        nodes.append({"id": r['name'], "group": r['category'], "logo": r['logo_path']})
-        links.append({"source": "SoulAdventure", "target": r['name']})
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("SELECT name, category, logo_path FROM nodes")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
         
-    return jsonify({"nodes": nodes, "links": links})
+        nodes = [{"id": "SoulAdventure", "group": "Center"}]
+        links = []
+        
+        for r in rows:
+            nodes.append({"id": r['name'], "group": r['category'], "logo": r['logo_path']})
+            links.append({"source": "SoulAdventure", "target": r['name']})
+            
+        return jsonify({"nodes": nodes, "links": links})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
+    # Run sync on local or server startup
     sync_vault() 
     app.run(host='0.0.0.0', port=10000)
