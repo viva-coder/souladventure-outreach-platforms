@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoulAdventure · Outreach Universe</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0f1a;
+    --bg2: #111827;
+    --surface: rgba(255,255,255,0.04);
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e4d9;
+    --muted: rgba(232,228,217,0.45);
+
+    --soul: #f0c060;       /* SoulAdventure gold */
+    --platform: #7dd3b0;   /* Platforms – teal */
+    --nsw: #e07b7b;        /* NSW – rose */
+    --qld: #e8a06a;        /* QLD – amber */
+    --vic: #9b8fe8;        /* VIC – lavender */
+    --other: #6abfe8;      /* Other States – sky */
+    --general: #b8d96a;    /* General/Niche – lime */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    background: linear-gradient(180deg, rgba(11,15,26,0.98) 70%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-circle {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--soul);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    color: #0b0f1a;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    letter-spacing: 0.05em;
+    color: var(--soul);
+  }
+  header span {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+
+  /* ── Legend ── */
+  #legend {
+    position: fixed;
+    top: 70px; left: 20px;
+    z-index: 100;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 12px;
+    line-height: 1.9;
+    min-width: 160px;
+  }
+  #legend h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .leg-row { display: flex; align-items: center; gap: 8px; }
+  .leg-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Tooltip ── */
+  #tooltip {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    max-width: 240px;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  #tooltip .tt-name { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  #tooltip .tt-region { font-size: 11px; color: var(--muted); }
+  #tooltip .tt-link { font-size: 11px; color: var(--soul); margin-top: 6px; word-break: break-all; }
+  #tooltip img.tt-logo {
+    width: 100%; max-height: 36px;
+    object-fit: contain;
+    margin-bottom: 8px;
+    filter: brightness(1.1);
+  }
+
+  /* ── SVG canvas ── */
+  #graph { width: 100%; height: 100%; }
+
+  .node circle { cursor: pointer; transition: filter 0.2s; }
+  .node circle:hover { filter: brightness(1.4); }
+  .node text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    fill: var(--text);
+    pointer-events: none;
+    text-anchor: middle;
+  }
+
+  .link { stroke: rgba(255,255,255,0.07); stroke-width: 1; }
+
+  /* ── Info panel (click) ── */
+  #panel {
+    position: fixed;
+    right: -340px;
+    top: 64px; bottom: 0;
+    width: 320px;
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    z-index: 150;
+    padding: 24px;
+    overflow-y: auto;
+    transition: right 0.35s cubic-bezier(.16,1,.3,1);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  #panel.open { right: 0; }
+  #panel h2 { font-family: 'Cinzel', serif; font-size: 15px; color: var(--soul); margin-bottom: 6px; }
+  #panel .p-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.07);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  #panel .p-logo { max-height: 48px; margin-bottom: 16px; filter: brightness(1.1); }
+  #panel a { color: var(--soul); text-decoration: none; }
+  #panel a:hover { text-decoration: underline; }
+  #panel .p-close {
+    position: absolute; top: 14px; right: 14px;
+    background: none; border: none;
+    color: var(--muted); font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  #panel .p-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+  #panel .p-section-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+
+  /* Star particles */
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<header>
+  <div class="logo-circle">SA</div>
+  <div>
+    <h1>SoulAdventure <span>· Outreach Universe</span></h1>
+  </div>
+</header>
+
+<div id="legend">
+  <h3>Node Type</h3>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--soul);width:14px;height:14px;"></div> SoulAdventure</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--platform);"></div> Platforms</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--general);"></div> General / Niche</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--nsw);"></div> NSW</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--qld);"></div> QLD</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--vic);"></div> VIC</div>
+  <div class="leg-row"><div class="leg-dot" style="background:var(--other);"></div> Other States</div>
+</div>
+
+<div id="tooltip">
+  <div class="tt-name"></div>
+  <div class="tt-region"></div>
+  <div class="tt-link"></div>
+</div>
+
+<div id="panel">
+  <button class="p-close" onclick="closePanel()">×</button>
+  <div id="panel-content"></div>
+</div>
+
+<svg id="graph"></svg>
+
+<script>
+// ── Star canvas ──────────────────────────────────────────────
+(function(){
+  const c = document.getElementById('stars');
+  const ctx = c.getContext('2d');
+  function resize(){ c.width = innerWidth; c.height = innerHeight; draw(); }
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    for(let i=0;i<180;i++){
+      const x=Math.random()*c.width, y=Math.random()*c.height;
+      const r=Math.random()*1.1;
+      const a=Math.random()*0.4+0.05;
+      ctx.beginPath();
+      ctx.arc(x,y,r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(232,228,217,${a})`;
+      ctx.fill();
+    }
+  }
+  window.addEventListener('resize',resize);
+  resize();
+})();
+
+// ── Data ────────────────────────────────────────────────────
+const COLOR = {
+  soul:    'var(--soul)',
+  platform:'var(--platform)',
+  nsw:     'var(--nsw)',
+  qld:     'var(--qld)',
+  vic:     'var(--vic)',
+  other:   'var(--other)',
+  general: 'var(--general)',
+};
+
+const LOGO_URLS = {
+  'BookRetreats':        'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/bookretreats.svg',
+  'Retreat Guru':        'https://retreat.guru/favicon.ico',
+  'Tripaneer':           'https://www.tripaneer.com/favicon.ico',
+  'Mindtrip':            'https://mindtrip.ai/favicon.ico',
+  'Conscious City Guide':'https://www.consciouscityguide.com/favicon.ico',
+  'Destination Deluxe':  'https://www.destinationdeluxe.com/favicon.ico',
+  'The Good Index':      'https://thegoodindex.com/favicon.ico',
+  'Tribu':               'https://tribu.com/favicon.ico',
+};
+
+const nodes = [
+  // ── Centre ──
+  { id:'sa', label:'SoulAdventure', type:'soul', r:28, desc:'Your retreat outreach hub. Connecting yoga & wellness retreat groups across Australia and beyond.', url:'https://souladventure.world' },
+
+  // ── Hub nodes ──
+  { id:'h-platform', label:'Platforms', type:'platform', r:18, hub:true },
+  { id:'h-general',  label:'General\n& Niche', type:'general', r:16, hub:true },
+  { id:'h-nsw',      label:'NSW', type:'nsw', r:16, hub:true },
+  { id:'h-qld',      label:'QLD', type:'qld', r:16, hub:true },
+  { id:'h-vic',      label:'VIC', type:'vic', r:16, hub:true },
+  { id:'h-other',    label:'Other\nStates', type:'other', r:16, hub:true },
+
+  // ── Platforms ──
+  { id:'p-bookretr',  label:'BookRetreats', type:'platform', url:'https://bookretreats.com', logo:'BookRetreats' },
+  { id:'p-guru',      label:'Retreat Guru', type:'platform', url:'https://retreat.guru', logo:'Retreat Guru' },
+  { id:'p-tripaneer', label:'Tripaneer',    type:'platform', url:'https://tripaneer.com', logo:'Tripaneer' },
+  { id:'p-mindtrip',  label:'Mindtrip',     type:'platform', url:'https://mindtrip.ai', logo:'Mindtrip' },
+  { id:'p-ccg',       label:'Conscious City\nGuide', type:'platform', url:'https://consciouscityguide.com', logo:'Conscious City Guide' },
+  { id:'p-deluxe',    label:'Destination\nDeluxe', type:'platform', url:'https://destinationdeluxe.com', logo:'Destination Deluxe' },
+  { id:'p-goodindex', label:'The Good\nIndex', type:'platform', url:'https://thegoodindex.com', logo:'The Good Index' },
+  { id:'p-tribu',     label:'Tribu',        type:'platform', url:'https://tribu.com', logo:'Tribu' },
+
+  // ── General / Niche ──
+  { id:'g1',  label:'Conscious Retreats\nWorldwide', type:'general', url:'https://facebook.com/groups' },
+  { id:'g2',  label:'Japanese Yoga\nAustralia', type:'general', url:'https://facebook.com/Japanese-Yoga-Australia-188303314348' },
+  { id:'g3',  label:'Online Yoga &\nWellness Classes', type:'general', url:'https://facebook.com/groups' },
+  { id:'g4',  label:'Reciprocity\nGroup', type:'general', url:'https://facebook.com/groups' },
+  { id:'g5',  label:'RetreatHub\nProfessionals', type:'general', url:'https://facebook.com/groups' },
+  { id:'g6',  label:'The Yoga\nof Birth', type:'general', url:'https://facebook.com/groups/yogabirth' },
+  { id:'g7',  label:'Yin Yoga\nAustralia', type:'general', url:'https://facebook.com/groups' },
+  { id:'g8',  label:'Yoga & Meditation\nRetreats AU', type:'general', url:'https://facebook.com/groups/18576075' },
+  { id:'g9',  label:'Yoga Education\nResources AU', type:'general', url:'https://facebook.com/groups' },
+  { id:'g10', label:'Yoga Meditation\n& Wellbeing', type:'general', url:'https://facebook.com/groups' },
+  { id:'g11', label:'Yoga Retreat\nLeaders', type:'general', url:'https://facebook.com/groups' },
+  { id:'g12', label:'Yoga Retreats\nWorldwide', type:'general', url:'https://facebook.com/groups' },
+  { id:'g13', label:'Yoga Teachers', type:'general', url:'https://facebook.com/groups' },
+
+  // ── NSW ──
+  { id:'n1',  label:'Acro Yoga\nCentral Coast', type:'nsw' },
+  { id:'n2',  label:'Acro Yoga\nNewcastle', type:'nsw' },
+  { id:'n3',  label:'Acro Yoga\nSydney', type:'nsw' },
+  { id:'n4',  label:'Blue Mtns Yoga\nTeachers', type:'nsw' },
+  { id:'n5',  label:'Central Coast\nYoga Community', type:'nsw' },
+  { id:'n6',  label:'Coffs Coast\nYoga Teachers', type:'nsw' },
+  { id:'n7',  label:'Milton Ulladulla\nYoga', type:'nsw' },
+  { id:'n8',  label:'South Coast\nYoga Teachers', type:'nsw' },
+  { id:'n9',  label:'Spiritual Living\nSydney–CC–Newcastle', type:'nsw' },
+  { id:'n10', label:'Sydney Wellness\nCoaching', type:'nsw' },
+  { id:'n11', label:'Sydney Yoga\nInstructors', type:'nsw' },
+  { id:'n12', label:'Sydney Yoga\nTeachers', type:'nsw' },
+  { id:'n13', label:'Thriving\nIllawarra', type:'nsw' },
+  { id:'n14', label:'Vegan Yogis\nNewcastle', type:'nsw' },
+  { id:'n15', label:'Wollongong\nWellness', type:'nsw' },
+  { id:'n16', label:'Wollongong\nYoga Teachers', type:'nsw' },
+  { id:'n17', label:'YOGA COLLECTIVE\nSydney–South Coast', type:'nsw' },
+  { id:'n18', label:'Yoga\nSydney', type:'nsw' },
+
+  // ── QLD ──
+  { id:'q1',  label:'Acroyoga\nByron Bay', type:'qld' },
+  { id:'q2',  label:'Brisbane Yoga\nCommunity', type:'qld' },
+  { id:'q3',  label:'Brisbane Yoga\nTeachers', type:'qld' },
+  { id:'q4',  label:'Byron Bay\n& QLD', type:'qld' },
+  { id:'q5',  label:'Byron Bay\nYoga Teachers', type:'qld' },
+  { id:'q6',  label:'Byron Bay\nYoga Tribe', type:'qld' },
+  { id:'q7',  label:'Gold Coast Yoga\nTeachers & Trainees', type:'qld' },
+  { id:'q8',  label:'Gold Coast Yoga\nTeachers', type:'qld' },
+  { id:'q9',  label:'Kundalini SE QLD', type:'qld' },
+  { id:'q10', label:'Noosa Yoga\nCommunity', type:'qld' },
+  { id:'q11', label:'Queensland Yoga\nGroup', type:'qld' },
+  { id:'q12', label:'Toowoomba Yoga\nCollective', type:'qld' },
+  { id:'q13', label:'Townsville Yoga\nTeachers', type:'qld' },
+
+  // ── VIC ──
+  { id:'v1', label:'AcroYoga\nMelbourne', type:'vic' },
+  { id:'v2', label:'Melbourne Yoga\nTeachers Unite', type:'vic' },
+  { id:'v3', label:'Melbourne Yoga\nTeachers', type:'vic' },
+  { id:'v4', label:'Mornington Pen.\nYoga Network', type:'vic' },
+  { id:'v5', label:'Mornington Pen.\nYoga Teachers', type:'vic' },
+
+  // ── Other States ──
+  { id:'o1',  label:'Adelaide Yoga\nTeacher Network', type:'other', region:'Adelaide', url:'https://facebook.com/groups/16186943' },
+  { id:'o2',  label:'Adelaide Yoga\nTeachers', type:'other', region:'Adelaide', url:'https://facebook.com/groups/15348915' },
+  { id:'o3',  label:'Awakening Divine\nFire AU', type:'other' },
+  { id:'o4',  label:'Canberra Yoga\nScene', type:'other' },
+  { id:'o5',  label:'Darwin Yoga\nCommunity', type:'other' },
+  { id:'o6',  label:'Darwin Yoga\nTeachers', type:'other' },
+  { id:'o7',  label:'Denmark AU\nYoga Community', type:'other' },
+  { id:'o8',  label:'Yoga in Mparntwe\nAlice Springs', type:'other', url:'https://facebook.com/groups/14586876' },
+  { id:'o9',  label:'Yoga Instructors\nCanberra', type:'other' },
+  { id:'o10', label:'Yoga Teachers\nDarwin', type:'other' },
+  { id:'o11', label:'Yoga Teachers\nPerth WA', type:'other' },
+];
+
+const links = [
+  // centre → hubs
+  ...['h-platform','h-general','h-nsw','h-qld','h-vic','h-other'].map(t=>({ source:'sa', target:t, strength:0.8 })),
+  // hubs → leaves
+  ...['p-bookretr','p-guru','p-tripaneer','p-mindtrip','p-ccg','p-deluxe','p-goodindex','p-tribu'].map(t=>({ source:'h-platform', target:t })),
+  ...['g1','g2','g3','g4','g5','g6','g7','g8','g9','g10','g11','g12','g13'].map(t=>({ source:'h-general', target:t })),
+  ...['n1','n2','n3','n4','n5','n6','n7','n8','n9','n10','n11','n12','n13','n14','n15','n16','n17','n18'].map(t=>({ source:'h-nsw', target:t })),
+  ...['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13'].map(t=>({ source:'h-qld', target:t })),
+  ...['v1','v2','v3','v4','v5'].map(t=>({ source:'h-vic', target:t })),
+  ...['o1','o2','o3','o4','o5','o6','o7','o8','o9','o10','o11'].map(t=>({ source:'h-other', target:t })),
+];
+
+// Resolve CSS vars to hex for D3
+const cssVarCache = {};
+function cssVar(name){
+  if(cssVarCache[name]) return cssVarCache[name];
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  cssVarCache[name]=v; return v;
+}
+const typeColor = {
+  soul:    ()=>cssVar('--soul'),
+  platform:()=>cssVar('--platform'),
+  general: ()=>cssVar('--general'),
+  nsw:     ()=>cssVar('--nsw'),
+  qld:     ()=>cssVar('--qld'),
+  vic:     ()=>cssVar('--vic'),
+  other:   ()=>cssVar('--other'),
+};
+
+// ── D3 graph ────────────────────────────────────────────────
+const svg = d3.select('#graph');
+let W = innerWidth, H = innerHeight;
+
+const g = svg.append('g');
+
+// zoom
+svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom', e=>{ g.attr('transform', e.transform); }));
+
+// simulation
+const sim = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d=>d.id).distance(d=>{
+    if(d.source.id==='sa') return 160;
+    if(d.source.id&&d.source.id.startsWith('h-')) return 100;
+    return 80;
+  }).strength(d=>d.strength||0.5))
+  .force('charge', d3.forceManyBody().strength(d=> d.type==='soul'?-800 : d.hub?-500 : -150))
+  .force('center', d3.forceCenter(W/2, H/2))
+  .force('collision', d3.forceCollide().radius(d=> (d.r||9)+14));
+
+// links
+const linkEl = g.append('g').attr('class','links')
+  .selectAll('line').data(links).join('line').attr('class','link');
+
+// nodes
+const node = g.append('g').attr('class','nodes')
+  .selectAll('g').data(nodes).join('g').attr('class','node')
+  .call(d3.drag()
+    .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+    .on('drag', (e,d)=>{ d.fx=e.x; d.fy=e.y; })
+    .on('end',  (e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
+  );
+
+node.append('circle')
+  .attr('r', d=>d.r||9)
+  .attr('fill', d=>typeColor[d.type]())
+  .attr('fill-opacity', d=>d.type==='soul'?1:0.82)
+  .attr('stroke', d=>d.type==='soul'?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.12)')
+  .attr('stroke-width', d=>d.type==='soul'?2:1);
+
+// glow filter
+const defs = svg.append('defs');
+const filter = defs.append('filter').attr('id','glow');
+filter.append('feGaussianBlur').attr('stdDeviation','3').attr('result','coloredBlur');
+const feMerge = filter.append('feMerge');
+feMerge.append('feMergeNode').attr('in','coloredBlur');
+feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+node.filter(d=>d.type==='soul'||d.hub)
+  .select('circle').attr('filter','url(#glow)');
+
+// labels
+node.each(function(d){
+  const el = d3.select(this);
+  const lines = d.label.split('\n');
+  const r = d.r||9;
+  const yOff = r+12;
+  if(lines.length===1){
+    el.append('text').attr('y', yOff).text(lines[0]);
+  } else {
+    const txt = el.append('text');
+    lines.forEach((ln,i)=>{
+      txt.append('tspan').attr('x',0).attr('dy', i===0 ? yOff : '1.1em').text(ln);
+    });
+  }
+});
+
+// ── Tooltip & panel ─────────────────────────────────────────
+const tip = document.getElementById('tooltip');
+
+node.on('mouseenter',(e,d)=>{
+  if(d.hub||d.type==='soul') return;
+  const tt = tip;
+  tt.querySelector('.tt-name').textContent = d.label.replace('\n',' ');
+  tt.querySelector('.tt-region').textContent = d.region||(d.type==='platform'?'Platform':'FB Group · '+(d.type.toUpperCase()));
+  tt.querySelector('.tt-link').textContent = d.url ? '↗ Open link' : '';
+  tt.style.opacity='1';
+})
+.on('mousemove',e=>{
+  tip.style.left=(e.clientX+14)+'px';
+  tip.style.top=(e.clientY-10)+'px';
+})
+.on('mouseleave',()=>{ tip.style.opacity='0'; })
+.on('click',(e,d)=>{
+  e.stopPropagation();
+  if(d.hub) return;
+  openPanel(d);
+});
+
+svg.on('click',()=>closePanel());
+
+function openPanel(d){
+  const panel = document.getElementById('panel');
+  const content = document.getElementById('panel-content');
+  const color = typeColor[d.type]();
+  const typeLabel = {
+    soul:'SoulAdventure HQ', platform:'Retreat Platform',
+    general:'General / Niche FB Group', nsw:'NSW FB Group',
+    qld:'QLD FB Group', vic:'VIC FB Group', other:'Other States FB Group'
+  }[d.type]||d.type;
+
+  content.innerHTML = `
+    <h2>${d.label.replace(/\n/g,' ')}</h2>
+    <div class="p-badge" style="color:${color}">${typeLabel}</div>
+    ${d.desc?`<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${d.desc}</p>`:''}
+    ${d.url?`<p><a href="${d.url}" target="_blank" rel="noopener">↗ Visit Page</a></p>`:''}
+    ${d.region?`<hr class="p-divider"><div class="p-section-title">Region</div><p>${d.region}</p>`:''}
+  `;
+  panel.classList.add('open');
+}
+
+function closePanel(){
+  document.getElementById('panel').classList.remove('open');
+}
+
+// ── Simulation tick ──────────────────────────────────────────
+sim.on('tick',()=>{
+  linkEl
+    .attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
+    .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+  node.attr('transform',d=>`translate(${d.x},${d.y})`);
+});
+
+// Resize
+window.addEventListener('resize',()=>{
+  W=innerWidth; H=innerHeight;
+  sim.force('center', d3.forceCenter(W/2,H/2)).alpha(0.3).restart();
+});
+</script>
+</body>
+</html>

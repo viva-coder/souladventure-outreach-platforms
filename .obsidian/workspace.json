@@ -1,0 +1,1238 @@
+{
+  "main": {
+    "id": "39c2ac2b74e05840",
+    "type": "split",
+    "children": [
+      {
+        "id": "45d9b9878ad4b19b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dd7bbb95d13ad971",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "SOULADVENTURE RETREAT GROUPS - Sheet1.pdf"
+              },
+              "icon": "lucide-file-text",
+              "title": "SOULADVENTURE RETREAT GROUPS - Sheet1"
+            }
+          },
+          {
+            "id": "50b4077c2ead3898",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Acro Yoga Sydney.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Acro Yoga Sydney"
+            }
+          },
+          {
+            "id": "17e01b076b7c9774",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "edef6a3239df8991",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Acro Yoga Central Coast.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Acro Yoga Central Coast"
+            }
+          },
+          {
+            "id": "cb163ab82754b899",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "e3b5f601b9fe4e6d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/AcroYoga Melbourne.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "AcroYoga Melbourne"
+            }
+          },
+          {
+            "id": "d22b1f06f322e0f9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/Melbourne Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Melbourne Yoga Teachers"
+            }
+          },
+          {
+            "id": "626e7de939d068d0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/Melbourne Yoga Teachers Unite.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Melbourne Yoga Teachers Unite"
+            }
+          },
+          {
+            "id": "dd7a5558a9cb6981",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/Mornington Peninsula Yoga Network.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Mornington Peninsula Yoga Network"
+            }
+          },
+          {
+            "id": "5cfb65003ab9c1e0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Byron Bay & Queensland.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Byron Bay & Queensland"
+            }
+          },
+          {
+            "id": "763752fdabfa2f28",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Byron Bay Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Byron Bay Yoga Teachers"
+            }
+          },
+          {
+            "id": "658960059f132bc3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Byron Bay Yoga Tribe.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Byron Bay Yoga Tribe"
+            }
+          },
+          {
+            "id": "c8a84003903836c0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Brisbane Yoga Community.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Brisbane Yoga Community"
+            }
+          },
+          {
+            "id": "315c2739a8797a09",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Brisbane Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Brisbane Yoga Teachers"
+            }
+          },
+          {
+            "id": "6edd17b4cb2cc6e2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Gold Coast Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Gold Coast Yoga Teachers"
+            }
+          },
+          {
+            "id": "be4dd26875c817f7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Adelaide Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Adelaide Yoga Teachers"
+            }
+          },
+          {
+            "id": "7bf70733c44e8d6c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Adelaide Yoga Teacher Network.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Adelaide Yoga Teacher Network"
+            }
+          },
+          {
+            "id": "6658482444c5a580",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Yoga Teachers Perth WA.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Teachers Perth WA"
+            }
+          },
+          {
+            "id": "0166273a2beb4f88",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Canberra Yoga Scene.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Canberra Yoga Scene"
+            }
+          },
+          {
+            "id": "e8116c71e0441fa6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Yoga Instructors of Canberra.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Instructors of Canberra"
+            }
+          },
+          {
+            "id": "3c24fcc15f1f796d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Darwin Yoga Community.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Darwin Yoga Community"
+            }
+          },
+          {
+            "id": "8e9c4daf1314597e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Darwin Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Darwin Yoga Teachers"
+            }
+          },
+          {
+            "id": "3a2786f683342a98",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Yoga Teachers in Darwin.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Teachers in Darwin"
+            }
+          },
+          {
+            "id": "78f914ac1d65e794",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Yoga in Mparntwe Alice Springs.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga in Mparntwe Alice Springs"
+            }
+          },
+          {
+            "id": "ee557ffd7a831be1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Townsville Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Townsville Yoga Teachers"
+            }
+          },
+          {
+            "id": "294d98046f717b99",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Toowoomba Yoga Collective.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Toowoomba Yoga Collective"
+            }
+          },
+          {
+            "id": "b84b418d53f2ad72",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Denmark Australia Yoga Community.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Denmark Australia Yoga Community"
+            }
+          },
+          {
+            "id": "a9b74bad1d3252dd",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "cb5ab4b3328ff1b3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Tribu.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Tribu"
+            }
+          },
+          {
+            "id": "2d1ef3e2f3ec5e7a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Mindtrip.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Mindtrip"
+            }
+          },
+          {
+            "id": "92c16a5855dcb918",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Retreat Guru.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Retreat Guru"
+            }
+          },
+          {
+            "id": "ce32226775ca6ffd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/BookRetreats.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "BookRetreats"
+            }
+          },
+          {
+            "id": "33f42956436d8155",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Destination Deluxe.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Destination Deluxe"
+            }
+          },
+          {
+            "id": "29543261201c6891",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/The Good Index.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "The Good Index"
+            }
+          },
+          {
+            "id": "67b5934725d91efa",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Conscious City Guide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Conscious City Guide"
+            }
+          },
+          {
+            "id": "69c4934726293195",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02_Platforms/Tripaneer.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Tripaneer"
+            }
+          },
+          {
+            "id": "61b5866060108938",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga Retreats Worldwide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Retreats Worldwide"
+            }
+          },
+          {
+            "id": "f9a3b841e68bffa9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga Retreat Leaders.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Retreat Leaders"
+            }
+          },
+          {
+            "id": "a5b000f21a190272",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yin Yoga Australia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yin Yoga Australia"
+            }
+          },
+          {
+            "id": "baf0ce48a55e176b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/The Yoga of Birth.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "The Yoga of Birth"
+            }
+          },
+          {
+            "id": "e052c397a8a029e5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga and Meditation Retreats in Australia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga and Meditation Retreats in Australia"
+            }
+          },
+          {
+            "id": "ec0781bd82cf504a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/AcroYoga Melbourne.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "AcroYoga Melbourne"
+            }
+          },
+          {
+            "id": "2d3c6e306a4807bc",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "00_Meta/Template - Resource.md.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Template - Resource.md"
+            }
+          },
+          {
+            "id": "856d704223999b4b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Brisbane Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Brisbane Yoga Teachers"
+            }
+          },
+          {
+            "id": "5a60df0e16b26024",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Awakening the Divine Fire Australia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Awakening the Divine Fire Australia"
+            }
+          },
+          {
+            "id": "cb3b36079f7b42cd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Japanese Yoga Australia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Japanese Yoga Australia"
+            }
+          },
+          {
+            "id": "d099811db80020f2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/Other_States/Yoga Instructors of Canberra.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Instructors of Canberra"
+            }
+          },
+          {
+            "id": "87f71c16f8b7d296",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga Education Resources Australia.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Education Resources Australia"
+            }
+          },
+          {
+            "id": "63780f8c843be0c5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Wollongong Wellness Guide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Wollongong Wellness Guide"
+            }
+          },
+          {
+            "id": "568c7a581b57204b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Thriving Illawarra Community.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Thriving Illawarra Community"
+            }
+          },
+          {
+            "id": "777e346fe7b16de3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Vegan Yogis and Teachers of Newcastle.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Vegan Yogis and Teachers of Newcastle"
+            }
+          },
+          {
+            "id": "ab2b4e34c6a88050",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Central Coast Yoga Community.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Central Coast Yoga Community"
+            }
+          },
+          {
+            "id": "1bc85b2ce25345cf",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Coffs Coast Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Coffs Coast Yoga Teachers"
+            }
+          },
+          {
+            "id": "4fe06df3d6e6a70d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Milton Ulladulla Yoga and Natural Movement.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Milton Ulladulla Yoga and Natural Movement"
+            }
+          },
+          {
+            "id": "745de1f7960f656d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/South Coast Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "South Coast Yoga Teachers"
+            }
+          },
+          {
+            "id": "be9757109daa9ba0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/YOGA COLLECTIVE Sydney to South Coast.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "YOGA COLLECTIVE Sydney to South Coast"
+            }
+          },
+          {
+            "id": "d3bb8627cddd8c05",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Yoga Sydney.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Sydney"
+            }
+          },
+          {
+            "id": "86f005e93f1068b0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Sydney Yoga Instructors.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Sydney Yoga Instructors"
+            }
+          },
+          {
+            "id": "a50351acbc39fafd",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Wollongong Yoga teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Wollongong Yoga teachers"
+            }
+          },
+          {
+            "id": "ecc56a43e2ee113c",
+            "type": "leaf",
+            "state": {
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "Graph view"
+            }
+          },
+          {
+            "id": "3ce674a920710ea5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Teachers"
+            }
+          },
+          {
+            "id": "8fdc720f0d3c9e1c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Yoga Meditation & Wellbeing.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Yoga Meditation & Wellbeing"
+            }
+          },
+          {
+            "id": "a6af6cc8a25a197e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Conscious Retreats Worldwide.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Conscious Retreats Worldwide"
+            }
+          },
+          {
+            "id": "65991ad09bd49594",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Online Yoga and Wellness Classes.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Online Yoga and Wellness Classes"
+            }
+          },
+          {
+            "id": "3e40cd56324704c6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/General_and_Niche/Reciprocity Group.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Reciprocity Group"
+            }
+          },
+          {
+            "id": "5a6a5ab435c55ae1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Gold Coast Yoga Teachers and Trainees.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Gold Coast Yoga Teachers and Trainees"
+            }
+          },
+          {
+            "id": "90b0ecc8145f09ce",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Queensland Yoga Group.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Queensland Yoga Group"
+            }
+          },
+          {
+            "id": "2b57a5bf663abc37",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Kundalini yoga teachers network SE QLD.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Kundalini yoga teachers network SE QLD"
+            }
+          },
+          {
+            "id": "31c8ade951ba4be0",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/VIC/Mornington Peninsula Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Mornington Peninsula Yoga Teachers"
+            }
+          },
+          {
+            "id": "cca2af61ab6c21b6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Acro Yoga Newcastle.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Acro Yoga Newcastle"
+            }
+          },
+          {
+            "id": "ec43a0891ba041fa",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/NSW/Blue Mountains Yoga Teachers.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Blue Mountains Yoga Teachers"
+            }
+          },
+          {
+            "id": "078a0cd9c9bbe47f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Gold Coast Yoga Teachers and Trainees.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Gold Coast Yoga Teachers and Trainees"
+            }
+          },
+          {
+            "id": "99ca38d0aeacdbf2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "01_FB_Groups/QLD/Acroyoga Byron Bay.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Acroyoga Byron Bay"
+            }
+          },
+          {
+            "id": "9facbc3f7e2ac60d",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "OTHER/🧘 Retreat Outreach System_ Team Guide.pdf"
+              },
+              "icon": "lucide-file-text",
+              "title": "🧘 Retreat Outreach System_ Team Guide"
+            }
+          }
+        ],
+        "currentTab": 73
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "ac8a0e491562cc1d",
+    "type": "split",
+    "children": [
+      {
+        "id": "16979980a9c0014b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "527136ef8c68c153",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "eadd28a4c5973807",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "3845d4a3ca493b5a",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "092ce46349d7a88d",
+    "type": "split",
+    "children": [
+      {
+        "id": "62654e19919191f0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f29fad67bb57cc07",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "SOULADVENTURE RETREAT GROUPS - Sheet1.pdf",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for SOULADVENTURE RETREAT GROUPS - Sheet1"
+            }
+          },
+          {
+            "id": "bb94edbacca90814",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "SOULADVENTURE RETREAT GROUPS - Sheet1.pdf",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from SOULADVENTURE RETREAT GROUPS - Sheet1"
+            }
+          },
+          {
+            "id": "c75d8c5f66e1a4a1",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "c99a2aeb5c0a5ff8",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "1d119311682762b3",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "SOULADVENTURE RETREAT GROUPS - Sheet1.pdf",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of SOULADVENTURE RETREAT GROUPS - Sheet1"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "527136ef8c68c153",
+  "lastOpenFiles": [
+    "index.html",
+    "Untitled.md",
+    "OTHER",
+    "souladventure.world_ (1).png",
+    "OTHER/souladventure.world_.png",
+    "OTHER/souladventure_brand_discovery_fillable.pdf",
+    "OTHER/SOULADVENTURE RETREAT GROUPS - Sheet1.pdf",
+    "OTHER/SoulAdventure LOGO.png",
+    "OTHER/🧘 Retreat Outreach System_ Team Guide.pdf",
+    "OTHER/_should do  OBISIDAN.pdf",
+    "assets/Logos for Retreat websites/Conscious City Guide .jpg",
+    "assets/Logos for Retreat websites/Booking.Com logo.jpg",
+    "assets/Logos for Retreat websites/All Events logo.jpg",
+    "00_Meta/Outreach Dashboard.md.md",
+    "assets/Logos for Retreat websites/tripaneer logo.jpg",
+    "assets/Logos for Retreat websites/BookYogaRetreats logo.jpg",
+    "assets/Logos for Retreat websites/The Good Index.jpg",
+    "assets/Logos for Retreat websites/TripAdvisor.jpg",
+    "assets/Logos for Retreat websites",
+    "assets",
+    "Siem Reap March 2026.md",
+    "01_FB_Groups/VIC/Melbourne Yoga Teachers.md",
+    "00_Meta/Template - Resource.md.md",
+    "01_FB_Groups/Other_States/Awakening the Divine Fire Australia.md",
+    "01_FB_Groups/NSW/Spiritual Living Sydney - CC - Newcastle.md",
+    "01_FB_Groups/QLD/Acroyoga Byron Bay.md",
+    "01_FB_Groups/QLD/Gold Coast Yoga Teachers and Trainees.md",
+    "01_FB_Groups/General_and_Niche/Yoga Teachers.md",
+    "01_FB_Groups/General_and_Niche/Yoga Meditation & Wellbeing.md",
+    "01_FB_Groups/General_and_Niche/Conscious Retreats Worldwide.md",
+    "01_FB_Groups/General_and_Niche/Online Yoga and Wellness Classes.md",
+    "01_FB_Groups/General_and_Niche/Reciprocity Group.md",
+    "01_FB_Groups/General_and_Niche/RetreatHub Professionals.md",
+    "01_FB_Groups/NSW/Blue Mountains Yoga Teachers.md",
+    "01_FB_Groups/VIC/Mornington Peninsula Yoga Teachers.md",
+    "01_FB_Groups/QLD/Queensland Yoga Group.md",
+    "01_FB_Groups/NSW/Acro Yoga Newcastle.md",
+    "01_FB_Groups/QLD/Kundalini yoga teachers network SE QLD.md",
+    "01_FB_Groups/General_and_Niche/Yoga Retreat Leaders.md",
+    "02_Platforms/The Good Index.md",
+    "02_Platforms/Tribu.md",
+    "02_Platforms/Tripaneer.md",
+    "02_Platforms/Destination Deluxe.md",
+    "01_FB_Groups/General_and_Niche",
+    "00_Meta",
+    "02_Platforms"
+  ]
+}
