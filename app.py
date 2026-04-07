@@ -38,7 +38,7 @@ def sync_vault():
         '01_fb_groups/nsw': 'nsw',
         '01_fb_groups/qld': 'qld',
         '01_fb_groups/vic': 'vic',
-        '01_fb_groups/general-and_niche': 'general', # Fixed path
+        '01_fb_groups/general_and_niche': 'general', # Fixed path
         '01_fb_groups/other_states': 'other',          # Fixed path (with your typo)
         '02_plaforms': 'platform'
     }
