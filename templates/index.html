@@ -1,423 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SoulAdventure · Outreach Universe</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+
 <style>
-  :root {
-    --bg: #0a0d0f;
-    --bg2: #111518;
-    --bg3: #181e22;
-    --border: #1e2830;
-    --text: #c8d4cc;
-    --text-dim: #566860;
-    --text-bright: #e8f0ea;
-    --gold: #c9a96e;
-    --gold-dim: #7a6040;
-    --teal: #4db89e;
-    --rose: #d4748a;
-    --amber: #d4a04a;
-    --lavender: #9b7fd4;
-    --sky: #5aaccf;
-    --lime: #7db87a;
-    --panel: 380px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; }
+body {
+  margin:0;
+  background:#0a0d0f;
+  color:#c8d4cc;
+  font-family: monospace;
+}
+#graph { width:100vw; height:100vh; }
 
-  /* HEADER */
-  #header {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; gap: 20px;
-    padding: 14px 24px;
-    background: linear-gradient(to bottom, rgba(10,13,15,0.98), rgba(10,13,15,0));
-    pointer-events: none;
-  }
-  #header .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px; font-weight: 300; letter-spacing: 0.12em;
-    color: var(--gold); pointer-events: auto;
-  }
-  #header .logo span { font-style: italic; color: var(--text-bright); }
-  #header .subtitle {
-    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--text-dim); padding-top: 2px;
-  }
-  #header .spacer { flex: 1; }
-  #stats {
-    display: flex; gap: 24px; pointer-events: auto;
-  }
-  .stat { text-align: right; }
-  .stat-val { font-size: 20px; color: var(--gold); font-weight: 300; }
-  .stat-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+#filters {
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+}
 
-  /* CANVAS */
-  #graph-container {
-    width: 100%; height: 100%;
-    background: radial-gradient(ellipse at 30% 40%, #0d1a14 0%, #0a0d0f 60%);
-  }
-  svg { width: 100%; height: 100%; cursor: grab; }
-  svg:active { cursor: grabbing; }
+.pill {
+  padding:6px 12px;
+  border:1px solid #333;
+  cursor:pointer;
+}
 
-  /* SEARCH BAR */
-  #search-bar {
-    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-    z-index: 100;
-    display: flex; align-items: center; gap: 0;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 2px; overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    width: 440px;
-  }
-  #search-icon { padding: 10px 12px; color: var(--text-dim); font-size: 14px; }
-  #search-input {
-    flex: 1; background: none; border: none; outline: none;
-    font-family: 'DM Mono', monospace; font-size: 12px;
-    color: var(--text-bright); padding: 10px 0;
-    letter-spacing: 0.05em;
-  }
-  #search-input::placeholder { color: var(--text-dim); }
-  #search-clear {
-    padding: 10px 14px; cursor: pointer; color: var(--text-dim);
-    font-size: 16px; line-height: 1;
-    transition: color 0.2s;
-  }
-  #search-clear:hover { color: var(--gold); }
+.pill.active {
+  background:#c9a96e;
+  color:black;
+}
 
-  /* FILTER PILLS */
-  #filters {
-    position: fixed; top: 118px; left: 50%; transform: translateX(-50%);
-    z-index: 100;
-    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-  }
-  .pill {
-    padding: 6px 14px; border-radius: 2px;
-    font-family: 'DM Mono', monospace; font-size: 9px;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    cursor: pointer; border: 1px solid transparent;
-    transition: all 0.3s;
-    user-select: none;
-    background: rgba(255, 255, 255, 0.02);
-  }
-  .pill:hover { border-color: currentColor; background: rgba(255, 255, 255, 0.05); }
-  
-  .pill.active { 
-    background: rgba(255, 255, 255, 0.12); 
-    border-color: currentColor; 
-    box-shadow: 0 0 15px currentColor;
-    color: var(--text-bright) !important;
-  }
-
-  /* Matching IDs to Data */
-  .pill[data-cat="all"] { color: var(--gold); }
-  .pill[data-cat="02_platforms"] { color: var(--teal); }
-  .pill[data-cat="general_and_niche"] { color: var(--lime); }
-  .pill[data-cat="NSW"] { color: var(--rose); }
-  .pill[data-cat="QLD"] { color: var(--amber); }
-  .pill[data-cat="VIC"] { color: var(--lavender); }
-  .pill[data-cat="other_states"] { color: var(--sky); }
-
-  /* LEGEND */
-  #legend {
-    position: fixed; bottom: 24px; left: 24px; z-index: 100;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-  /* SIDE PANEL */
-  #panel {
-    position: fixed; top: 0; right: 0; bottom: 0; width: var(--panel);
-    background: var(--bg2); border-left: 1px solid var(--border);
-    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
-    z-index: 200; display: flex; flex-direction: column;
-    overflow: hidden;
-  }
-  #panel.open { transform: translateX(0); }
-  #panel-header {
-    padding: 24px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: flex-start; justify-content: space-between;
-  }
-  #panel-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px; font-weight: 400; color: var(--text-bright);
-    line-height: 1.2; flex: 1; padding-right: 12px;
-  }
-  #panel-close {
-    cursor: pointer; color: var(--text-dim); font-size: 20px; line-height: 1;
-    transition: color 0.2s; padding: 2px;
-  }
-  #panel-close:hover { color: var(--gold); }
-  #panel-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-  .panel-field label {
-    display: block; font-size: 9px; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;
-  }
-  .panel-field input, .panel-field select, .panel-field textarea {
-    width: 100%; background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text-bright); font-family: 'DM Mono', monospace;
-    font-size: 12px; padding: 10px 12px; border-radius: 2px;
-    outline: none; transition: border-color 0.2s; resize: vertical;
-  }
-  .panel-field input:focus, .panel-field select:focus, .panel-field textarea:focus {
-    border-color: var(--gold-dim);
-  }
-  #panel-footer {
-    padding: 20px 24px; border-top: 1px solid var(--border);
-    display: flex; gap: 10px;
-  }
-  .btn {
-    flex: 1; padding: 11px; border: none; border-radius: 2px;
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-primary { background: var(--gold); color: #0a0d0f; }
-  .btn-primary:hover { background: #e0bc82; }
-  .btn-danger { background: transparent; border: 1px solid #6b2a2a; color: #c46060; }
-  .btn-danger:hover { background: #6b2a2a; color: #ffaaaa; }
-  .btn-link {
-    background: transparent; border: 1px solid var(--border); color: var(--teal);
-    text-decoration: none; display: flex; align-items: center; justify-content: center;
-    flex: none; padding: 11px 16px;
-  }
-
-  #add-btn {
-    position: fixed; bottom: 24px; right: 24px; z-index: 100;
-    width: 48px; height: 48px; border-radius: 50%;
-    background: var(--gold); color: #0a0d0f;
-    border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 20px rgba(201,169,110,0.35);
-  }
-
-  #tooltip { position: fixed; z-index: 300; pointer-events: none; background: var(--bg2); border: 1px solid var(--border); padding: 8px 14px; opacity: 0; font-size: 11px; transition: opacity 0.15s; }
-  #toast { position: fixed; bottom: 80px; right: 24px; z-index: 400; background: var(--bg2); border: 1px solid var(--border); padding: 12px 20px; opacity: 0; font-size: 11px; transition: all 0.3s; pointer-events: none; }
-  #toast.show { opacity: 1; transform: translateY(-10px); }
+#add {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  padding:10px;
+}
 </style>
 </head>
+
 <body>
-
-<div id="header">
-  <div>
-    <div class="logo">Soul<span>Adventure</span></div>
-    <div class="subtitle">Outreach Universe</div>
-  </div>
-  <div class="spacer"></div>
-  <div id="stats">
-    <div class="stat"><div class="stat-val" id="stat-nodes">—</div><div class="stat-label">Nodes</div></div>
-    <div class="stat"><div class="stat-val" id="stat-platforms">—</div><div class="stat-label">Platforms</div></div>
-    <div class="stat"><div class="stat-val" id="stat-groups">—</div><div class="stat-label">FB Groups</div></div>
-  </div>
-</div>
-
-<div id="search-bar">
-  <div id="search-icon">⌕</div>
-  <input id="search-input" type="text" placeholder="Search nodes…" autocomplete="off"/>
-  <div id="search-clear">×</div>
-</div>
 
 <div id="filters">
   <div class="pill active" data-cat="all">All</div>
-  <div class="pill" data-cat="02_platforms">PLATFORMS</div>
-  <div class="pill" data-cat="general_and_niche">GENERAL</div>
+  <div class="pill" data-cat="02_platforms">Platforms</div>
+  <div class="pill" data-cat="general_and_niche">General</div>
   <div class="pill" data-cat="NSW">NSW</div>
   <div class="pill" data-cat="QLD">QLD</div>
   <div class="pill" data-cat="VIC">VIC</div>
-  <div class="pill" data-cat="other_states">OTHER STATES</div>
+  <div class="pill" data-cat="other_states">Other</div>
 </div>
 
+<button id="add">+ Add</button>
 
-
-<div id="graph-container"><svg id="graph"></svg></div>
-
-<div id="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>SoulAdventure HQ</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Platforms</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--lime)"></div>General</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>NSW</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>QLD</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--lavender)"></div>VIC</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div>Other</div>
-</div>
-
-<div id="panel">
-  <div id="panel-header"><div id="panel-title">Node</div><div id="panel-close">×</div></div>
-  <div id="panel-body">
-    <input type="hidden" id="field-id"/>
-    <div class="panel-field"><label>Name</label><input type="text" id="field-name"/></div>
-    <div class="panel-field">
-      <label>Category</label>
-      <select id="field-category">
-        <option value="platform">Platform</option>
-        <option value="general">FB Group — General</option>
-        <option value="NSW">FB Group — NSW</option>
-        <option value="QLD">FB Group — QLD</option>
-        <option value="VIC">FB Group — VIC</option>
-        <option value="other">FB Group — Other</option>
-      </select>
-    </div>
-    <div class="panel-field"><label>URL</label><input type="url" id="field-url"/></div>
-    <div class="panel-field"><label>Members</label><input type="text" id="field-members"/></div>
-    <div class="panel-field"><label>Notes</label><textarea id="field-notes" rows="4"></textarea></div>
-  </div>
-  <div id="panel-footer">
-    <button class="btn btn-primary" id="btn-save">Save</button>
-    <a class="btn btn-link" id="btn-link" href="#" target="_blank">↗</a>
-    <button class="btn btn-danger" id="btn-delete">Delete</button>
-  </div>
-</div>
-
-<button id="add-btn">+</button>
-<div id="tooltip"></div>
-<div id="toast"></div>
+<svg id="graph"></svg>
 
 <script>
-// Logic to handle Case Sensitivity (QLD vs qld)
-const COLOR = { 
-  center: '#c9a96e', 
-  platform: '#4db89e', 
-  general: '#7db87a', 
-  nsw: '#d4748a', NSW: '#d4748a',
-  qld: '#d4a04a', QLD: '#d4a04a',
-  vic: '#9b7fd4', VIC: '#9b7fd4',
-  other: '#5aaccf' 
+const COLOR = {
+  center:'#c9a96e',
+  '02_platforms':'#4db89e',
+  'general_and_niche':'#7db87a',
+  'NSW':'#d4748a',
+  'QLD':'#d4a04a',
+  'VIC':'#9b7fd4',
+  'other_states':'#5aaccf'
 };
 
-let allNodes = [], simulation, svg, g, linkSel, nodeSel, activeFilter = 'all', searchTerm = '';
+let nodesData = [];
+let activeFilter = 'all';
 
-async function loadNodes() {
-  try {
-    const res = await fetch('/api/nodes');
-    allNodes = await res.json();
-    updateStats();
-    buildGraph();
-  } catch (err) { console.error(err); }
+/* -------- NORMALIZE -------- */
+function normalize(cat){
+  const c = String(cat || '').toLowerCase();
+
+  if(c.includes('platform')) return '02_platforms';
+  if(c.includes('general')) return 'general_and_niche';
+  if(c.includes('nsw')) return 'NSW';
+  if(c.includes('qld')) return 'QLD';
+  if(c.includes('vic')) return 'VIC';
+  return 'other_states';
 }
 
-function updateStats() {
-  document.getElementById('stat-nodes').textContent = allNodes.length + 1;
-  document.getElementById('stat-platforms').textContent = allNodes.filter(n => n.category.toLowerCase() === 'platform').length;
-  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category.toLowerCase() !== 'platform' && n.category !== 'center').length;
+/* -------- LOAD -------- */
+async function load(){
+  const res = await fetch('/api/nodes');
+  const data = await res.json();
+
+  nodesData = data.map(n => ({
+    ...n,
+    id: String(n.id),
+    category: normalize(n.category)
+  }));
+
+  draw();
 }
 
-function buildGraph() {
-  const container = document.getElementById('graph-container');
-  const W = container.clientWidth, H = container.clientHeight;
-  d3.select('#graph').selectAll('*').remove();
-  svg = d3.select('#graph');
-  const zoom = d3.zoom().scaleExtent([0.1, 4]).on('zoom', e => g.attr('transform', e.transform));
-  svg.call(zoom);
-  g = svg.append('g');
+/* -------- DRAW -------- */
+function draw(){
+  const svg = d3.select("#graph");
+  svg.selectAll("*").remove();
 
-  // KEY FIX: Convert categories to uppercase to match the filter buttons exactly
-  const filtered = allNodes.filter(n => {
-    // This turns "NSW", "nsw", "02_Platforms", and "platform" 
-    // all into lowercase so they match no matter what.
-    const nodeCat = String(n.category || '').trim().toLowerCase();
-    const filterCat = String(activeFilter || '').trim().toLowerCase();
-    
-    // Match if 'all' is selected OR if the names match perfectly in lowercase
-    const catMatch = (filterCat === 'all' || nodeCat === filterCat);
-    
-    // Search bar logic
-    const searchMatch = (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    return catMatch && searchMatch;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const center = { id:'center', name:'SoulAdventure', category:'center' };
+
+  const filtered = nodesData.filter(n =>
+    activeFilter === 'all' || n.category === activeFilter
+  );
+
+  const nodes = [center, ...filtered];
+  const links = filtered.map(n => ({ source:'center', target:n.id }));
+
+  const sim = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d=>d.id).distance(150))
+    .force("charge", d3.forceManyBody().strength(-200))
+    .force("center", d3.forceCenter(width/2, height/2));
+
+  const link = svg.append("g")
+    .selectAll("line")
+    .data(links)
+    .join("line")
+    .attr("stroke","#333");
+
+  const node = svg.append("g")
+    .selectAll("circle")
+    .data(nodes)
+    .join("circle")
+    .attr("r", d=> d.id==='center'?20:8)
+    .attr("fill", d=> COLOR[d.category] || "#999")
+    .call(d3.drag()
+      .on("drag", (e,d)=>{
+        d.fx = e.x;
+        d.fy = e.y;
+      })
+    );
+
+  const text = svg.append("g")
+    .selectAll("text")
+    .data(nodes)
+    .join("text")
+    .text(d=>d.name)
+    .attr("font-size","10px")
+    .attr("fill","#ccc");
+
+  sim.on("tick", ()=>{
+    link
+      .attr("x1",d=>d.source.x)
+      .attr("y1",d=>d.source.y)
+      .attr("x2",d=>d.target.x)
+      .attr("y2",d=>d.target.y);
+
+    node
+      .attr("cx",d=>d.x)
+      .attr("cy",d=>d.y);
+
+    text
+      .attr("x",d=>d.x)
+      .attr("y",d=>d.y+15);
   });
-
-  const center = { id: 'center', name: 'SoulAdventure', category: 'center', x: W/2, y: H/2, fx: W/2, fy: H/2 };
-  const nodes = [center, ...filtered.map(n => ({...n, id: String(n.id)}))];
-  const links = filtered.map(n => ({ source: 'center', target: String(n.id) }));
-
-  simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(180))
-    .force('charge', d3.forceManyBody().strength(-200))
-    .force('center', d3.forceCenter(W/2, H/2))
-    .force('collision', d3.forceCollide().radius(40));
-
-  linkSel = g.append('g').selectAll('line').data(links).join('line').attr('stroke', '#1e2830').attr('stroke-width', 1);
-  
-  const nodeG = g.append('g').selectAll('g').data(nodes).join('g')
-    .call(d3.drag().on('start', dragStarted).on('drag', dragged).on('end', dragEnded))
-    .on('click', (e, d) => { if(d.id !== 'center') openPanel(d); })
-    .on('mouseover', (e, d) => { if(d.id !== 'center') showTooltip(e, d); })
-    .on('mouseout', hideTooltip);
-
-  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category] || COLOR[d.category.toUpperCase()] || '#666');
-  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category] || COLOR[d.category.toUpperCase()] || '#666').text(d => d.name).style('font-size', '10px');
-
-  simulation.on('tick', () => {
-    linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
-    nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
-  });
 }
 
-function openPanel(d) {
-  document.getElementById('panel-title').textContent = d.name;
-  document.getElementById('field-id').value = d.id;
-  document.getElementById('field-name').value = d.name;
-  document.getElementById('field-category').value = d.category;
-  document.getElementById('field-url').value = d.url || '';
-  document.getElementById('field-members').value = d.members || '';
-  document.getElementById('field-notes').value = d.notes || '';
-  document.getElementById('btn-link').href = d.url || '#';
-  document.getElementById('panel').classList.add('open');
-}
-
-document.getElementById('btn-save').onclick = async () => {
-  const id = document.getElementById('field-id').value;
-  const payload = {
-    name: document.getElementById('field-name').value,
-    category: document.getElementById('field-category').value,
-    url: document.getElementById('field-url').value,
-    members: document.getElementById('field-members').value,
-    notes: document.getElementById('field-notes').value
+/* -------- FILTER UI -------- */
+document.querySelectorAll('.pill').forEach(p=>{
+  p.onclick = ()=>{
+    document.querySelectorAll('.pill').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    activeFilter = p.dataset.cat;
+    draw();
   };
-  const method = id && id !== '' ? 'PUT' : 'POST';
-  const url = id && id !== '' ? `/api/nodes/${id}` : '/api/nodes';
-  await fetch(url, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-  document.getElementById('panel').classList.remove('open');
-  loadNodes();
-};
-
-document.getElementById('btn-delete').onclick = async () => {
-  const id = document.getElementById('field-id').value;
-  if(id && confirm('Delete?')) {
-    await fetch(`/api/nodes/${id}`, { method: 'DELETE' });
-    document.getElementById('panel').classList.remove('open');
-    loadNodes();
-  }
-};
-
-document.getElementById('add-btn').onclick = () => {
-  document.getElementById('field-id').value = '';
-  document.getElementById('field-name').value = '';
-  document.getElementById('field-category').value = 'general';
-  document.getElementById('panel-title').textContent = 'New Node';
-  document.getElementById('panel').classList.add('open');
-};
-
-document.getElementById('search-input').oninput = e => { searchTerm = e.target.value; buildGraph(); };
-document.getElementById('search-clear').onclick = () => { document.getElementById('search-input').value = ''; searchTerm = ''; buildGraph(); };
-document.getElementById('panel-close').onclick = () => document.getElementById('panel').classList.remove('open');
-
-document.querySelectorAll('.pill').forEach(p => p.onclick = () => { 
-  document.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
-  p.classList.add('active'); 
-  activeFilter = p.dataset.cat; 
-  buildGraph(); 
 });
 
-function dragStarted(e, d) { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
-function dragged(e, d) { d.fx = e.x; d.fy = e.y; }
-function dragEnded(e, d) { if (!e.active) simulation.alphaTarget(0); if (d.id !== 'center') { d.fx = null; d.fy = null; } }
-function showTooltip(e, d) { const t = document.getElementById('tooltip'); t.innerHTML = d.name; t.style.opacity = 1; t.style.left = e.pageX + 'px'; t.style.top = e.pageY + 'px'; }
-function hideTooltip() { document.getElementById('tooltip').style.opacity = 0; }
+/* -------- ADD NODE -------- */
+document.getElementById('add').onclick = async ()=>{
+  const name = prompt("Name?");
+  const category = prompt("Category (NSW, QLD, VIC, platform, general)?");
 
-loadNodes();
+  await fetch('/api/nodes', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, category })
+  });
+
+  load();
+};
+
+load();
 </script>
+
 </body>
 </html>
