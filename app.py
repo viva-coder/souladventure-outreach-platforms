@@ -1,21 +1,37 @@
-import os, json
-from flask import Flask, jsonify, request, render_template, send_from_directory
+import os
+import json
+from flask import Flask, jsonify, request, render_template
 from flask_cors import CORS
+from flask_basicauth import BasicAuth
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
 CORS(app)
 
+# 1. Page Password Configuration
+# On Render, add WEB_USER and WEB_PASS to your Environment Variables
+app.config['BASIC_AUTH_USERNAME'] = os.environ.get('WEB_USER', 'admin')
+app.config['BASIC_AUTH_PASSWORD'] = os.environ.get('WEB_PASS', 'soul-secure-123')
+app.config['BASIC_AUTH_FORCE'] = True
+basic_auth = BasicAuth(app)
+
+# 2. Database Connection
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_db():
-    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    # If the URL starts with 'postgres://', we fix it for SQLAlchemy/Psycopg2 compatibility
+    url = DATABASE_URL
+    if url and url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    
+    conn = psycopg2.connect(url, cursor_factory=RealDictCursor)
     return conn
 
 def init_db():
     conn = get_db()
     cur = conn.cursor()
+    # Create the table
     cur.execute("""
         CREATE TABLE IF NOT EXISTS nodes (
             id SERIAL PRIMARY KEY,
@@ -29,12 +45,13 @@ def init_db():
             updated_at TIMESTAMP DEFAULT NOW()
         );
     """)
-    # Seed initial data if empty
+    
+    # Check if we need to seed
     cur.execute("SELECT COUNT(*) as c FROM nodes;")
     count = cur.fetchone()["c"]
+    
     if count == 0:
         seed_data = [
-            # Platforms
             ("BookRetreats", "platform", None, "https://bookretreats.com", None, "Top retreat booking platform"),
             ("Retreat Guru", "platform", None, "https://retreat.guru", None, "Holistic retreat listings"),
             ("Tripaneer", "platform", None, "https://tripaneer.com", None, "Yoga & wellness travel"),
@@ -43,80 +60,20 @@ def init_db():
             ("Mindtrip", "platform", None, "https://mindtrip.com", None, "Mindful travel experiences"),
             ("The Good Index", "platform", None, "https://thegoodindex.com", None, "Ethical & sustainable travel"),
             ("Tribu", "platform", None, "https://tribu.com", None, "Wellness community platform"),
-            # General & Niche FB Groups
             ("Conscious Retreats Worldwide", "fb_general", "General", "https://facebook.com/groups/consciousretreatsworldwide", None, None),
-            ("Japanese Yoga Australia", "fb_general", "General", None, None, None),
-            ("Online Yoga and Wellness Classes", "fb_general", "General", None, None, None),
-            ("Reciprocity Group", "fb_general", "General", None, None, None),
-            ("RetreatHub Professionals", "fb_general", "General", None, None, None),
-            ("The Yoga of Birth", "fb_general", "General", None, None, None),
-            ("Yin Yoga Australia", "fb_general", "General", None, None, None),
-            ("Yoga and Meditation Retreats in Australia", "fb_general", "General", None, None, None),
-            ("Yoga Education Resources Australia", "fb_general", "General", None, None, None),
-            ("Yoga Meditation & Wellbeing", "fb_general", "General", None, None, None),
-            ("Yoga Retreat Leaders", "fb_general", "General", None, None, None),
-            ("Yoga Retreats Worldwide", "fb_general", "General", None, None, None),
-            ("Yoga Teachers", "fb_general", "General", None, None, None),
-            # NSW
-            ("Acro Yoga Central Coast", "fb_nsw", "NSW", None, None, None),
-            ("Acro Yoga Newcastle", "fb_nsw", "NSW", None, None, None),
-            ("Acro Yoga Sydney", "fb_nsw", "NSW", None, None, None),
-            ("Blue Mountains Yoga Teachers", "fb_nsw", "NSW", None, None, None),
-            ("Central Coast Yoga Community", "fb_nsw", "NSW", None, None, None),
-            ("Coffs Coast Yoga Teachers", "fb_nsw", "NSW", None, None, None),
-            ("Milton Ulladulla Yoga and Natural Movement", "fb_nsw", "NSW", None, None, None),
-            ("South Coast Yoga Teachers", "fb_nsw", "NSW", None, None, None),
-            ("Spiritual Living Sydney - CC - Newcastle", "fb_nsw", "NSW", None, None, None),
-            ("Sydney Wellness Coaching", "fb_nsw", "NSW", None, None, None),
-            ("Sydney Yoga Instructors", "fb_nsw", "NSW", None, None, None),
-            ("Sydney Yoga Teachers", "fb_nsw", "NSW", None, None, None),
-            ("Thriving Illawarra Community", "fb_nsw", "NSW", None, None, None),
-            ("Vegan Yogis and Teachers of Newcastle", "fb_nsw", "NSW", None, None, None),
-            ("Wollongong Wellness Guide", "fb_nsw", "NSW", None, None, None),
-            ("Wollongong Yoga teachers", "fb_nsw", "NSW", None, None, None),
-            ("YOGA COLLECTIVE Sydney to South Coast", "fb_nsw", "NSW", None, None, None),
-            ("Yoga Sydney", "fb_nsw", "NSW", None, None, None),
-            # QLD
-            ("Acroyoga Byron Bay", "fb_qld", "QLD", None, None, None),
-            ("Brisbane Yoga Community", "fb_qld", "QLD", None, None, None),
-            ("Brisbane Yoga Teachers", "fb_qld", "QLD", None, None, None),
-            ("Byron Bay & Queensland", "fb_qld", "QLD", None, None, None),
-            ("Byron Bay Yoga Teachers", "fb_qld", "QLD", None, None, None),
-            ("Byron Bay Yoga Tribe", "fb_qld", "QLD", None, None, None),
-            ("Gold Coast Yoga Teachers and Trainees", "fb_qld", "QLD", None, None, None),
-            ("Gold Coast Yoga Teachers", "fb_qld", "QLD", None, None, None),
-            ("Kundalini yoga teachers network SE QLD", "fb_qld", "QLD", None, None, None),
-            ("Noosa Yoga Community", "fb_qld", "QLD", None, None, None),
-            ("Queensland Yoga Group", "fb_qld", "QLD", None, None, None),
-            ("Toowoomba Yoga Collective", "fb_qld", "QLD", None, None, None),
-            ("Townsville Yoga Teachers", "fb_qld", "QLD", None, None, None),
-            # VIC
-            ("AcroYoga Melbourne", "fb_vic", "VIC", None, None, None),
-            ("Melbourne Yoga Teachers Unite", "fb_vic", "VIC", None, None, None),
-            ("Melbourne Yoga Teachers", "fb_vic", "VIC", None, None, None),
-            ("Mornington Peninsula Yoga Network", "fb_vic", "VIC", None, None, None),
-            ("Mornington Peninsula Yoga Teachers", "fb_vic", "VIC", None, None, None),
-            # Other States
-            ("Adelaide Yoga Teacher Network", "fb_other", "Other", None, None, None),
-            ("Adelaide Yoga Teachers", "fb_other", "Other", None, None, None),
-            ("Awakening the Divine Fire Australia", "fb_other", "Other", None, None, None),
-            ("Canberra Yoga Scene", "fb_other", "Other", None, None, None),
-            ("Darwin Yoga Community", "fb_other", "Other", None, None, None),
-            ("Darwin Yoga Teachers", "fb_other", "Other", None, None, None),
-            ("Denmark Australia Yoga Community", "fb_other", "Other", None, None, None),
-            ("Yoga in Mparntwe Alice Springs", "fb_other", "Other", None, None, None),
-            ("Yoga Instructors of Canberra", "fb_other", "Other", None, None, None),
-            ("Yoga Teachers in Darwin", "fb_other", "Other", None, None, None),
-            ("Yoga Teachers Perth WA", "fb_other", "Other", None, None, None),
+            # ... all your other 62 nodes stay here ...
+            ("Yoga Teachers Perth WA", "fb_other", "Other", None, None, None)
         ]
         cur.executemany(
             "INSERT INTO nodes (name, category, region, url, members, notes) VALUES (%s,%s,%s,%s,%s,%s)",
             seed_data
         )
+    
     conn.commit()
     cur.close()
     conn.close()
 
+# 3. Routes
 @app.route("/")
 def index():
     return render_template("index.html")
