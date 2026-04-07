@@ -104,7 +104,6 @@
   }
   .pill:hover { border-color: currentColor; background: rgba(255, 255, 255, 0.05); }
   
-  /* ACTIVE GLOW EFFECT */
   .pill.active { 
     background: rgba(255, 255, 255, 0.12); 
     border-color: currentColor; 
@@ -112,7 +111,6 @@
     color: var(--text-bright) !important;
   }
 
-  /* PILL COLORS */
   .pill[data-cat="all"] { color: var(--gold); }
   .pill[data-cat="platform"] { color: var(--teal); }
   .pill[data-cat="general"] { color: var(--lime); }
@@ -186,7 +184,6 @@
     flex: none; padding: 11px 16px;
   }
 
-  /* ADD BUTTON */
   #add-btn {
     position: fixed; bottom: 24px; right: 24px; z-index: 100;
     width: 48px; height: 48px; border-radius: 50%;
@@ -195,7 +192,6 @@
     box-shadow: 0 4px 20px rgba(201,169,110,0.35);
   }
 
-  /* TOOLTIP & TOAST */
   #tooltip { position: fixed; z-index: 300; pointer-events: none; background: var(--bg2); border: 1px solid var(--border); padding: 8px 14px; opacity: 0; font-size: 11px; transition: opacity 0.15s; }
   #toast { position: fixed; bottom: 80px; right: 24px; z-index: 400; background: var(--bg2); border: 1px solid var(--border); padding: 12px 20px; opacity: 0; font-size: 11px; transition: all 0.3s; pointer-events: none; }
   #toast.show { opacity: 1; transform: translateY(-10px); }
