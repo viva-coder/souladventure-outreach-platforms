@@ -314,8 +314,16 @@ function buildGraph() {
 
   // KEY FIX: Convert categories to uppercase to match the filter buttons exactly
   const filtered = allNodes.filter(n => {
-    const catMatch = (activeFilter === 'all' || n.category.toUpperCase() === activeFilter.toUpperCase());
+    // 1. Clean both strings: Remove spaces and make them LOWERCASE
+    const nodeCat = String(n.category || '').trim().toLowerCase();
+    const filterCat = String(activeFilter || '').trim().toLowerCase();
+    
+    // 2. Logic: Match if 'all' is selected OR the strings match exactly
+    const catMatch = (filterCat === 'all' || nodeCat === filterCat);
+    
+    // 3. Search bar logic
     const searchMatch = (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    
     return catMatch && searchMatch;
   });
 
