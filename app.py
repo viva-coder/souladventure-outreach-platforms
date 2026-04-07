@@ -1,135 +1,97 @@
 import os
-import json
-from flask import Flask, jsonify, request, render_template
-from flask_cors import CORS
-from flask_basicauth import BasicAuth
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from flask import Flask, render_template, jsonify
+from flask_basicauth import BasicAuth
 
 app = Flask(__name__)
-CORS(app)
 
-# 1. Page Password Configuration
-# On Render, add WEB_USER and WEB_PASS to your Environment Variables
+# Security & DB Config
 app.config['BASIC_AUTH_USERNAME'] = os.environ.get('WEB_USER', 'admin')
-app.config['BASIC_AUTH_PASSWORD'] = os.environ.get('WEB_PASS', 'soul-secure-123')
-app.config['BASIC_AUTH_FORCE'] = True
+app.config['BASIC_AUTH_PASSWORD'] = os.environ.get('WEB_PASS', 'password')
 basic_auth = BasicAuth(app)
-
-# 2. Database Connection
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db():
-    # If the URL starts with 'postgres://', we fix it for SQLAlchemy/Psycopg2 compatibility
     url = DATABASE_URL
     if url and url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
-    
-    conn = psycopg2.connect(url, cursor_factory=RealDictCursor)
-    return conn
+    return psycopg2.connect(url, cursor_factory=RealDictCursor)
 
-def init_db():
+def sync_vault():
+    """Scans the local folder structure and updates Postgres."""
     conn = get_db()
     cur = conn.cursor()
-    # Create the table
+    
     cur.execute("""
         CREATE TABLE IF NOT EXISTS nodes (
             id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL,
-            category TEXT NOT NULL,
-            region TEXT,
-            url TEXT,
-            members TEXT,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT NOW(),
-            updated_at TIMESTAMP DEFAULT NOW()
+            name TEXT UNIQUE NOT NULL,
+            category TEXT,
+            logo_path TEXT
         );
     """)
+
+    # This matches your actual folder names
+    categories = {
+        '01_FB_Groups/NSW': 'NSW',
+        '01_FB_Groups/QLD': 'QLD',
+        '01_FB_Groups/VIC': 'VIC',
+        '01_FB_Groups/General_and_Niche': 'General',
+        '01_FB_Groups/Other_States': 'Other',
+        '02_Platforms': 'Platform'
+    }
+
+    # Use "." because your folders are in the root directory
+    vault_base = "." 
     
-    # Check if we need to seed
-    cur.execute("SELECT COUNT(*) as c FROM nodes;")
-    count = cur.fetchone()["c"]
+    print("--- Starting Vault Sync ---")
     
-    if count == 0:
-        seed_data = [
-            ("BookRetreats", "platform", None, "https://bookretreats.com", None, "Top retreat booking platform"),
-            ("Retreat Guru", "platform", None, "https://retreat.guru", None, "Holistic retreat listings"),
-            ("Tripaneer", "platform", None, "https://tripaneer.com", None, "Yoga & wellness travel"),
-            ("Conscious City Guide", "platform", None, "https://consciouscityguide.com", None, "Conscious living directory"),
-            ("Destination Deluxe", "platform", None, "https://destinationdeluxe.com", None, "Luxury wellness travel"),
-            ("Mindtrip", "platform", None, "https://mindtrip.com", None, "Mindful travel experiences"),
-            ("The Good Index", "platform", None, "https://thegoodindex.com", None, "Ethical & sustainable travel"),
-            ("Tribu", "platform", None, "https://tribu.com", None, "Wellness community platform"),
-            ("Conscious Retreats Worldwide", "fb_general", "General", "https://facebook.com/groups/consciousretreatsworldwide", None, None),
-            # ... all your other 62 nodes stay here ...
-            ("Yoga Teachers Perth WA", "fb_other", "Other", None, None, None)
-        ]
-        cur.executemany(
-            "INSERT INTO nodes (name, category, region, url, members, notes) VALUES (%s,%s,%s,%s,%s,%s)",
-            seed_data
-        )
+    for folder_rel, cat_label in categories.items():
+        folder_path = os.path.join(vault_base, folder_rel)
+        if os.path.exists(folder_path):
+            print(f"Checking folder: {folder_path}")
+            for filename in os.listdir(folder_path):
+                if filename.endswith(".md"):
+                    node_name = filename.replace(".md", "")
+                    logo_file = f"{node_name}.jpg" 
+                    
+                    cur.execute("""
+                        INSERT INTO nodes (name, category, logo_path)
+                        VALUES (%s, %s, %s)
+                        ON CONFLICT (name) 
+                        DO UPDATE SET category = EXCLUDED.category, logo_path = EXCLUDED.logo_path;
+                    """, (node_name, cat_label, logo_file))
+                    print(f"  Added/Updated: {node_name}")
     
     conn.commit()
     cur.close()
     conn.close()
+    print("--- Sync Complete ---")
 
-# 3. Routes
-@app.route("/")
+@app.route('/')
+@basic_auth.required
 def index():
     return render_template("index.html")
 
-@app.route("/api/nodes", methods=["GET"])
-def get_nodes():
+@app.route('/api/data')
+def get_data():
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM nodes ORDER BY category, name;")
-    nodes = cur.fetchall()
+    cur.execute("SELECT name, category, logo_path FROM nodes")
+    rows = cur.fetchall()
     cur.close()
     conn.close()
-    return jsonify([dict(n) for n in nodes])
+    
+    nodes = [{"id": "SoulAdventure", "group": "Center"}]
+    links = []
+    
+    for r in rows:
+        nodes.append({"id": r['name'], "group": r['category'], "logo": r['logo_path']})
+        links.append({"source": "SoulAdventure", "target": r['name']})
+        
+    return jsonify({"nodes": nodes, "links": links})
 
-@app.route("/api/nodes", methods=["POST"])
-def create_node():
-    data = request.json
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO nodes (name, category, region, url, members, notes) VALUES (%s,%s,%s,%s,%s,%s) RETURNING *;",
-        (data["name"], data["category"], data.get("region"), data.get("url"), data.get("members"), data.get("notes"))
-    )
-    node = dict(cur.fetchone())
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify(node), 201
-
-@app.route("/api/nodes/<int:node_id>", methods=["PUT"])
-def update_node(node_id):
-    data = request.json
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute(
-        """UPDATE nodes SET name=%s, category=%s, region=%s, url=%s, members=%s, notes=%s, updated_at=NOW()
-           WHERE id=%s RETURNING *;""",
-        (data["name"], data["category"], data.get("region"), data.get("url"), data.get("members"), data.get("notes"), node_id)
-    )
-    node = cur.fetchone()
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify(dict(node))
-
-@app.route("/api/nodes/<int:node_id>", methods=["DELETE"])
-def delete_node(node_id):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM nodes WHERE id=%s;", (node_id,))
-    conn.commit()
-    cur.close()
-    conn.close()
-    return jsonify({"deleted": node_id})
-
-if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+if __name__ == '__main__':
+    sync_vault() 
+    app.run(host='0.0.0.0', port=10000)
