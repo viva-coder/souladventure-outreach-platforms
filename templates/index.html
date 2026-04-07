@@ -111,12 +111,13 @@
     color: var(--text-bright) !important;
   }
 
+  /* Matching IDs to Data */
   .pill[data-cat="all"] { color: var(--gold); }
   .pill[data-cat="platform"] { color: var(--teal); }
   .pill[data-cat="general"] { color: var(--lime); }
-  .pill[data-cat="nsw"] { color: var(--rose); }
-  .pill[data-cat="qld"] { color: var(--amber); }
-  .pill[data-cat="vic"] { color: var(--lavender); }
+  .pill[data-cat="NSW"] { color: var(--rose); }
+  .pill[data-cat="QLD"] { color: var(--amber); }
+  .pill[data-cat="VIC"] { color: var(--lavender); }
   .pill[data-cat="other"] { color: var(--sky); }
 
   /* LEGEND */
@@ -250,9 +251,9 @@
       <select id="field-category">
         <option value="platform">Platform</option>
         <option value="general">FB Group — General</option>
-        <option value="nsw">FB Group — NSW</option>
-        <option value="qld">FB Group — QLD</option>
-        <option value="vic">FB Group — VIC</option>
+        <option value="NSW">FB Group — NSW</option>
+        <option value="QLD">FB Group — QLD</option>
+        <option value="VIC">FB Group — VIC</option>
         <option value="other">FB Group — Other</option>
       </select>
     </div>
@@ -272,7 +273,17 @@
 <div id="toast"></div>
 
 <script>
-const COLOR = { center: '#c9a96e', platform: '#4db89e', general: '#7db87a', nsw: '#d4748a', qld: '#d4a04a', vic: '#9b7fd4', other: '#5aaccf' };
+// Logic to handle Case Sensitivity (QLD vs qld)
+const COLOR = { 
+  center: '#c9a96e', 
+  platform: '#4db89e', 
+  general: '#7db87a', 
+  nsw: '#d4748a', NSW: '#d4748a',
+  qld: '#d4a04a', QLD: '#d4a04a',
+  vic: '#9b7fd4', VIC: '#9b7fd4',
+  other: '#5aaccf' 
+};
+
 let allNodes = [], simulation, svg, g, linkSel, nodeSel, activeFilter = 'all', searchTerm = '';
 
 async function loadNodes() {
@@ -286,8 +297,8 @@ async function loadNodes() {
 
 function updateStats() {
   document.getElementById('stat-nodes').textContent = allNodes.length + 1;
-  document.getElementById('stat-platforms').textContent = allNodes.filter(n => n.category === 'platform').length;
-  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category !== 'platform' && n.category !== 'center').length;
+  document.getElementById('stat-platforms').textContent = allNodes.filter(n => n.category.toLowerCase() === 'platform').length;
+  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category.toLowerCase() !== 'platform' && n.category !== 'center').length;
 }
 
 function buildGraph() {
@@ -299,7 +310,13 @@ function buildGraph() {
   svg.call(zoom);
   g = svg.append('g');
 
-  const filtered = allNodes.filter(n => (activeFilter === 'all' || n.category === activeFilter) && (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase())));
+  // KEY FIX: Convert categories to uppercase to match the filter buttons exactly
+  const filtered = allNodes.filter(n => {
+    const catMatch = (activeFilter === 'all' || n.category.toUpperCase() === activeFilter.toUpperCase());
+    const searchMatch = (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return catMatch && searchMatch;
+  });
+
   const center = { id: 'center', name: 'SoulAdventure', category: 'center', x: W/2, y: H/2, fx: W/2, fy: H/2 };
   const nodes = [center, ...filtered.map(n => ({...n, id: String(n.id)}))];
   const links = filtered.map(n => ({ source: 'center', target: String(n.id) }));
@@ -318,8 +335,8 @@ function buildGraph() {
     .on('mouseover', (e, d) => { if(d.id !== 'center') showTooltip(e, d); })
     .on('mouseout', hideTooltip);
 
-  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category] || '#666');
-  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category] || '#666').text(d => d.name).style('font-size', '10px');
+  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category] || COLOR[d.category.toUpperCase()] || '#666');
+  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category] || COLOR[d.category.toUpperCase()] || '#666').text(d => d.name).style('font-size', '10px');
 
   simulation.on('tick', () => {
     linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
