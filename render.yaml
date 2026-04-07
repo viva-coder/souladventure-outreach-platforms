@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: souladventure-outreach
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: souladventure-db
+          property: connectionString
+
+databases:
+  - name: souladventure-db
+    databaseName: souladventure
+    plan: free

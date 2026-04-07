@@ -1188,6 +1188,10 @@
   },
   "active": "527136ef8c68c153",
   "lastOpenFiles": [
+    "README.md",
+    "requirements.txt",
+    "render.yaml",
+    "app.py",
     "index.html",
     "Untitled.md",
     "OTHER",
@@ -1207,7 +1211,6 @@
     "assets/Logos for Retreat websites/The Good Index.jpg",
     "assets/Logos for Retreat websites/TripAdvisor.jpg",
     "assets/Logos for Retreat websites",
-    "assets",
     "Siem Reap March 2026.md",
     "01_FB_Groups/VIC/Melbourne Yoga Teachers.md",
     "00_Meta/Template - Resource.md.md",
@@ -1230,9 +1233,6 @@
     "02_Platforms/The Good Index.md",
     "02_Platforms/Tribu.md",
     "02_Platforms/Tripaneer.md",
-    "02_Platforms/Destination Deluxe.md",
-    "01_FB_Groups/General_and_Niche",
-    "00_Meta",
-    "02_Platforms"
+    "02_Platforms/Destination Deluxe.md"
   ]
 }

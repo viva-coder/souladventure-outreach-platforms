@@ -1,514 +1,605 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>SoulAdventure · Outreach Universe</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
   :root {
-    --bg: #0b0f1a;
-    --bg2: #111827;
-    --surface: rgba(255,255,255,0.04);
-    --border: rgba(255,255,255,0.08);
-    --text: #e8e4d9;
-    --muted: rgba(232,228,217,0.45);
-
-    --soul: #f0c060;       /* SoulAdventure gold */
-    --platform: #7dd3b0;   /* Platforms – teal */
-    --nsw: #e07b7b;        /* NSW – rose */
-    --qld: #e8a06a;        /* QLD – amber */
-    --vic: #9b8fe8;        /* VIC – lavender */
-    --other: #6abfe8;      /* Other States – sky */
-    --general: #b8d96a;    /* General/Niche – lime */
+    --bg: #0a0d0f;
+    --bg2: #111518;
+    --bg3: #181e22;
+    --border: #1e2830;
+    --text: #c8d4cc;
+    --text-dim: #566860;
+    --text-bright: #e8f0ea;
+    --gold: #c9a96e;
+    --gold-dim: #7a6040;
+    --teal: #4db89e;
+    --rose: #d4748a;
+    --amber: #d4a04a;
+    --lavender: #9b7fd4;
+    --sky: #5aaccf;
+    --lime: #7db87a;
+    --panel: 380px;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    height: 100vh;
+  /* HEADER */
+  #header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; gap: 20px;
+    padding: 14px 24px;
+    background: linear-gradient(to bottom, rgba(10,13,15,0.98), rgba(10,13,15,0));
+    pointer-events: none;
+  }
+  #header .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300; letter-spacing: 0.12em;
+    color: var(--gold); pointer-events: auto;
+  }
+  #header .logo span { font-style: italic; color: var(--text-bright); }
+  #header .subtitle {
+    font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-dim); padding-top: 2px;
+  }
+  #header .spacer { flex: 1; }
+  #stats {
+    display: flex; gap: 24px; pointer-events: auto;
+  }
+  .stat { text-align: right; }
+  .stat-val { font-size: 20px; color: var(--gold); font-weight: 300; }
+  .stat-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+
+  /* CANVAS */
+  #graph-container {
+    width: 100%; height: 100%;
+    background: radial-gradient(ellipse at 30% 40%, #0d1a14 0%, #0a0d0f 60%);
+  }
+  svg { width: 100%; height: 100%; }
+
+  /* SEARCH BAR */
+  #search-bar {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    display: flex; align-items: center; gap: 0;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 2px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    width: 440px;
+  }
+  #search-icon { padding: 10px 12px; color: var(--text-dim); font-size: 14px; }
+  #search-input {
+    flex: 1; background: none; border: none; outline: none;
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    color: var(--text-bright); padding: 10px 0;
+    letter-spacing: 0.05em;
+  }
+  #search-input::placeholder { color: var(--text-dim); }
+  #search-clear {
+    padding: 10px 14px; cursor: pointer; color: var(--text-dim);
+    font-size: 16px; line-height: 1;
+    transition: color 0.2s;
+  }
+  #search-clear:hover { color: var(--gold); }
+
+  /* FILTER PILLS */
+  #filters {
+    position: fixed; top: 118px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+  }
+  .pill {
+    padding: 4px 12px; border-radius: 2px;
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; border: 1px solid transparent;
+    transition: all 0.2s; user-select: none;
+  }
+  .pill.active, .pill:hover { border-color: currentColor; }
+  .pill[data-cat="all"] { color: var(--gold); }
+  .pill[data-cat="platform"] { color: var(--teal); }
+  .pill[data-cat="fb_general"] { color: var(--lime); }
+  .pill[data-cat="fb_nsw"] { color: var(--rose); }
+  .pill[data-cat="fb_qld"] { color: var(--amber); }
+  .pill[data-cat="fb_vic"] { color: var(--lavender); }
+  .pill[data-cat="fb_other"] { color: var(--sky); }
+
+  /* LEGEND */
+  #legend {
+    position: fixed; bottom: 24px; left: 24px; z-index: 100;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* SIDE PANEL */
+  #panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: var(--panel);
+    background: var(--bg2); border-left: 1px solid var(--border);
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    z-index: 200; display: flex; flex-direction: column;
     overflow: hidden;
   }
+  #panel.open { transform: translateX(0); }
+  #panel-header {
+    padding: 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-start; justify-content: space-between;
+  }
+  #panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 400; color: var(--text-bright);
+    line-height: 1.2; flex: 1; padding-right: 12px;
+  }
+  #panel-close {
+    cursor: pointer; color: var(--text-dim); font-size: 20px; line-height: 1;
+    transition: color 0.2s; padding: 2px;
+  }
+  #panel-close:hover { color: var(--gold); }
+  #panel-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .panel-field label {
+    display: block; font-size: 9px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;
+  }
+  .panel-field input, .panel-field select, .panel-field textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text-bright); font-family: 'DM Mono', monospace;
+    font-size: 12px; padding: 10px 12px; border-radius: 2px;
+    outline: none; transition: border-color 0.2s; resize: vertical;
+  }
+  .panel-field input:focus, .panel-field select:focus, .panel-field textarea:focus {
+    border-color: var(--gold-dim);
+  }
+  .panel-field select option { background: var(--bg3); }
+  #panel-footer {
+    padding: 20px 24px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px;
+  }
+  .btn {
+    flex: 1; padding: 11px; border: none; border-radius: 2px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--gold); color: #0a0d0f; }
+  .btn-primary:hover { background: #e0bc82; }
+  .btn-danger { background: transparent; border: 1px solid #6b2a2a; color: #c46060; }
+  .btn-danger:hover { background: #6b2a2a; color: #ffaaaa; }
+  .btn-link {
+    background: transparent; border: 1px solid var(--border); color: var(--teal);
+    text-decoration: none; display: flex; align-items: center; justify-content: center;
+    flex: none; padding: 11px 16px;
+  }
+  .btn-link:hover { border-color: var(--teal); background: rgba(77,184,158,0.08); }
 
-  /* ── Header ── */
-  header {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 24px;
-    background: linear-gradient(180deg, rgba(11,15,26,0.98) 70%, transparent);
-    border-bottom: 1px solid var(--border);
+  /* ADD NODE BUTTON */
+  #add-btn {
+    position: fixed; bottom: 24px; right: 24px; z-index: 100;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--gold); color: #0a0d0f;
+    border: none; cursor: pointer; font-size: 22px; line-height: 1;
+    box-shadow: 0 4px 20px rgba(201,169,110,0.35);
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
   }
-  .logo-circle {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: var(--soul);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    color: #0b0f1a;
-    font-weight: 600;
-    flex-shrink: 0;
-  }
-  header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 17px;
-    letter-spacing: 0.05em;
-    color: var(--soul);
-  }
-  header span {
-    font-size: 12px;
-    color: var(--muted);
-    margin-left: 2px;
-  }
+  #add-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,169,110,0.5); }
 
-  /* ── Legend ── */
-  #legend {
-    position: fixed;
-    top: 70px; left: 20px;
-    z-index: 100;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-size: 12px;
-    line-height: 1.9;
-    min-width: 160px;
-  }
-  #legend h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-  .leg-row { display: flex; align-items: center; gap: 8px; }
-  .leg-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ── Tooltip ── */
+  /* TOOLTIP */
   #tooltip {
-    position: fixed;
-    z-index: 200;
-    pointer-events: none;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    max-width: 240px;
-    font-size: 13px;
-    line-height: 1.5;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-  #tooltip .tt-name { font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  #tooltip .tt-region { font-size: 11px; color: var(--muted); }
-  #tooltip .tt-link { font-size: 11px; color: var(--soul); margin-top: 6px; word-break: break-all; }
-  #tooltip img.tt-logo {
-    width: 100%; max-height: 36px;
-    object-fit: contain;
-    margin-bottom: 8px;
-    filter: brightness(1.1);
+    position: fixed; z-index: 300; pointer-events: none;
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 8px 14px; border-radius: 2px;
+    font-size: 11px; color: var(--text);
+    opacity: 0; transition: opacity 0.15s;
+    max-width: 220px; white-space: nowrap;
   }
 
-  /* ── SVG canvas ── */
-  #graph { width: 100%; height: 100%; }
-
-  .node circle { cursor: pointer; transition: filter 0.2s; }
-  .node circle:hover { filter: brightness(1.4); }
-  .node text {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 10px;
-    fill: var(--text);
-    pointer-events: none;
-    text-anchor: middle;
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 80px; right: 24px; z-index: 400;
+    background: var(--bg2); border: 1px solid var(--border);
+    padding: 12px 20px; border-radius: 2px;
+    font-size: 11px; color: var(--text-bright);
+    transform: translateY(20px); opacity: 0;
+    transition: all 0.3s; pointer-events: none;
   }
+  #toast.show { transform: translateY(0); opacity: 1; }
 
-  .link { stroke: rgba(255,255,255,0.07); stroke-width: 1; }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  /* ── Info panel (click) ── */
-  #panel {
-    position: fixed;
-    right: -340px;
-    top: 64px; bottom: 0;
-    width: 320px;
-    background: var(--bg2);
-    border-left: 1px solid var(--border);
-    z-index: 150;
-    padding: 24px;
-    overflow-y: auto;
-    transition: right 0.35s cubic-bezier(.16,1,.3,1);
-    font-size: 13px;
-    line-height: 1.7;
-  }
-  #panel.open { right: 0; }
-  #panel h2 { font-family: 'Cinzel', serif; font-size: 15px; color: var(--soul); margin-bottom: 6px; }
-  #panel .p-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.07);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-  #panel .p-logo { max-height: 48px; margin-bottom: 16px; filter: brightness(1.1); }
-  #panel a { color: var(--soul); text-decoration: none; }
-  #panel a:hover { text-decoration: underline; }
-  #panel .p-close {
-    position: absolute; top: 14px; right: 14px;
-    background: none; border: none;
-    color: var(--muted); font-size: 20px;
-    cursor: pointer;
-    line-height: 1;
-  }
-  #panel .p-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-  #panel .p-section-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-
-  /* Star particles */
-  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  /* Grid bg lines */
+  .grid-line { stroke: #131a1f; stroke-width: 1; }
 </style>
 </head>
 <body>
 
-<canvas id="stars"></canvas>
-
-<header>
-  <div class="logo-circle">SA</div>
+<!-- Header -->
+<div id="header">
   <div>
-    <h1>SoulAdventure <span>· Outreach Universe</span></h1>
+    <div class="logo">Soul<span>Adventure</span></div>
+    <div class="subtitle">Outreach Universe</div>
   </div>
-</header>
+  <div class="spacer"></div>
+  <div id="stats">
+    <div class="stat">
+      <div class="stat-val" id="stat-nodes">—</div>
+      <div class="stat-label">Nodes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-platforms">—</div>
+      <div class="stat-label">Platforms</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val" id="stat-groups">—</div>
+      <div class="stat-label">FB Groups</div>
+    </div>
+  </div>
+</div>
 
+<!-- Search -->
+<div id="search-bar">
+  <div id="search-icon">⌕</div>
+  <input id="search-input" type="text" placeholder="Search nodes…" autocomplete="off"/>
+  <div id="search-clear">×</div>
+</div>
+
+<!-- Filter pills -->
+<div id="filters">
+  <div class="pill active" data-cat="all">All</div>
+  <div class="pill" data-cat="platform">Platforms</div>
+  <div class="pill" data-cat="fb_general">General</div>
+  <div class="pill" data-cat="fb_nsw">NSW</div>
+  <div class="pill" data-cat="fb_qld">QLD</div>
+  <div class="pill" data-cat="fb_vic">VIC</div>
+  <div class="pill" data-cat="fb_other">Other States</div>
+</div>
+
+<!-- Graph -->
+<div id="graph-container">
+  <svg id="graph"></svg>
+</div>
+
+<!-- Legend -->
 <div id="legend">
-  <h3>Node Type</h3>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--soul);width:14px;height:14px;"></div> SoulAdventure</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--platform);"></div> Platforms</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--general);"></div> General / Niche</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--nsw);"></div> NSW</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--qld);"></div> QLD</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--vic);"></div> VIC</div>
-  <div class="leg-row"><div class="leg-dot" style="background:var(--other);"></div> Other States</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>SoulAdventure HQ</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Platforms</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--lime)"></div>General / Niche</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>NSW</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>QLD</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--lavender)"></div>VIC</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div>Other States</div>
 </div>
 
-<div id="tooltip">
-  <div class="tt-name"></div>
-  <div class="tt-region"></div>
-  <div class="tt-link"></div>
-</div>
-
+<!-- Side Panel -->
 <div id="panel">
-  <button class="p-close" onclick="closePanel()">×</button>
-  <div id="panel-content"></div>
+  <div id="panel-header">
+    <div id="panel-title">Node</div>
+    <div id="panel-close">×</div>
+  </div>
+  <div id="panel-body">
+    <input type="hidden" id="field-id"/>
+    <div class="panel-field">
+      <label>Name</label>
+      <input type="text" id="field-name" placeholder="Group or platform name"/>
+    </div>
+    <div class="panel-field">
+      <label>Category</label>
+      <select id="field-category">
+        <option value="platform">Platform</option>
+        <option value="fb_general">FB Group — General</option>
+        <option value="fb_nsw">FB Group — NSW</option>
+        <option value="fb_qld">FB Group — QLD</option>
+        <option value="fb_vic">FB Group — VIC</option>
+        <option value="fb_other">FB Group — Other States</option>
+      </select>
+    </div>
+    <div class="panel-field">
+      <label>URL / Link</label>
+      <input type="url" id="field-url" placeholder="https://…"/>
+    </div>
+    <div class="panel-field">
+      <label>Members</label>
+      <input type="text" id="field-members" placeholder="e.g. 4,200"/>
+    </div>
+    <div class="panel-field">
+      <label>Notes</label>
+      <textarea id="field-notes" rows="4" placeholder="Status, contact, outreach notes…"></textarea>
+    </div>
+  </div>
+  <div id="panel-footer">
+    <button class="btn btn-primary" id="btn-save">Save</button>
+    <a class="btn btn-link" id="btn-link" href="#" target="_blank" rel="noopener">↗</a>
+    <button class="btn btn-danger" id="btn-delete">Delete</button>
+  </div>
 </div>
 
-<svg id="graph"></svg>
+<!-- Add button -->
+<button id="add-btn" title="Add new node">+</button>
+
+<!-- Tooltip -->
+<div id="tooltip"></div>
+
+<!-- Toast -->
+<div id="toast"></div>
 
 <script>
-// ── Star canvas ──────────────────────────────────────────────
-(function(){
-  const c = document.getElementById('stars');
-  const ctx = c.getContext('2d');
-  function resize(){ c.width = innerWidth; c.height = innerHeight; draw(); }
-  function draw(){
-    ctx.clearRect(0,0,c.width,c.height);
-    for(let i=0;i<180;i++){
-      const x=Math.random()*c.width, y=Math.random()*c.height;
-      const r=Math.random()*1.1;
-      const a=Math.random()*0.4+0.05;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(232,228,217,${a})`;
-      ctx.fill();
-    }
-  }
-  window.addEventListener('resize',resize);
-  resize();
-})();
-
-// ── Data ────────────────────────────────────────────────────
 const COLOR = {
-  soul:    'var(--soul)',
-  platform:'var(--platform)',
-  nsw:     'var(--nsw)',
-  qld:     'var(--qld)',
-  vic:     'var(--vic)',
-  other:   'var(--other)',
-  general: 'var(--general)',
+  center:     '#c9a96e',
+  platform:   '#4db89e',
+  fb_general: '#7db87a',
+  fb_nsw:     '#d4748a',
+  fb_qld:     '#d4a04a',
+  fb_vic:     '#9b7fd4',
+  fb_other:   '#5aaccf',
 };
 
-const LOGO_URLS = {
-  'BookRetreats':        'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/bookretreats.svg',
-  'Retreat Guru':        'https://retreat.guru/favicon.ico',
-  'Tripaneer':           'https://www.tripaneer.com/favicon.ico',
-  'Mindtrip':            'https://mindtrip.ai/favicon.ico',
-  'Conscious City Guide':'https://www.consciouscityguide.com/favicon.ico',
-  'Destination Deluxe':  'https://www.destinationdeluxe.com/favicon.ico',
-  'The Good Index':      'https://thegoodindex.com/favicon.ico',
-  'Tribu':               'https://tribu.com/favicon.ico',
-};
+let allNodes = [];
+let simulation, svg, g, linkSel, nodeSel;
+let activeFilter = 'all';
+let searchTerm = '';
+let currentNode = null;
 
-const nodes = [
-  // ── Centre ──
-  { id:'sa', label:'SoulAdventure', type:'soul', r:28, desc:'Your retreat outreach hub. Connecting yoga & wellness retreat groups across Australia and beyond.', url:'https://souladventure.world' },
-
-  // ── Hub nodes ──
-  { id:'h-platform', label:'Platforms', type:'platform', r:18, hub:true },
-  { id:'h-general',  label:'General\n& Niche', type:'general', r:16, hub:true },
-  { id:'h-nsw',      label:'NSW', type:'nsw', r:16, hub:true },
-  { id:'h-qld',      label:'QLD', type:'qld', r:16, hub:true },
-  { id:'h-vic',      label:'VIC', type:'vic', r:16, hub:true },
-  { id:'h-other',    label:'Other\nStates', type:'other', r:16, hub:true },
-
-  // ── Platforms ──
-  { id:'p-bookretr',  label:'BookRetreats', type:'platform', url:'https://bookretreats.com', logo:'BookRetreats' },
-  { id:'p-guru',      label:'Retreat Guru', type:'platform', url:'https://retreat.guru', logo:'Retreat Guru' },
-  { id:'p-tripaneer', label:'Tripaneer',    type:'platform', url:'https://tripaneer.com', logo:'Tripaneer' },
-  { id:'p-mindtrip',  label:'Mindtrip',     type:'platform', url:'https://mindtrip.ai', logo:'Mindtrip' },
-  { id:'p-ccg',       label:'Conscious City\nGuide', type:'platform', url:'https://consciouscityguide.com', logo:'Conscious City Guide' },
-  { id:'p-deluxe',    label:'Destination\nDeluxe', type:'platform', url:'https://destinationdeluxe.com', logo:'Destination Deluxe' },
-  { id:'p-goodindex', label:'The Good\nIndex', type:'platform', url:'https://thegoodindex.com', logo:'The Good Index' },
-  { id:'p-tribu',     label:'Tribu',        type:'platform', url:'https://tribu.com', logo:'Tribu' },
-
-  // ── General / Niche ──
-  { id:'g1',  label:'Conscious Retreats\nWorldwide', type:'general', url:'https://facebook.com/groups' },
-  { id:'g2',  label:'Japanese Yoga\nAustralia', type:'general', url:'https://facebook.com/Japanese-Yoga-Australia-188303314348' },
-  { id:'g3',  label:'Online Yoga &\nWellness Classes', type:'general', url:'https://facebook.com/groups' },
-  { id:'g4',  label:'Reciprocity\nGroup', type:'general', url:'https://facebook.com/groups' },
-  { id:'g5',  label:'RetreatHub\nProfessionals', type:'general', url:'https://facebook.com/groups' },
-  { id:'g6',  label:'The Yoga\nof Birth', type:'general', url:'https://facebook.com/groups/yogabirth' },
-  { id:'g7',  label:'Yin Yoga\nAustralia', type:'general', url:'https://facebook.com/groups' },
-  { id:'g8',  label:'Yoga & Meditation\nRetreats AU', type:'general', url:'https://facebook.com/groups/18576075' },
-  { id:'g9',  label:'Yoga Education\nResources AU', type:'general', url:'https://facebook.com/groups' },
-  { id:'g10', label:'Yoga Meditation\n& Wellbeing', type:'general', url:'https://facebook.com/groups' },
-  { id:'g11', label:'Yoga Retreat\nLeaders', type:'general', url:'https://facebook.com/groups' },
-  { id:'g12', label:'Yoga Retreats\nWorldwide', type:'general', url:'https://facebook.com/groups' },
-  { id:'g13', label:'Yoga Teachers', type:'general', url:'https://facebook.com/groups' },
-
-  // ── NSW ──
-  { id:'n1',  label:'Acro Yoga\nCentral Coast', type:'nsw' },
-  { id:'n2',  label:'Acro Yoga\nNewcastle', type:'nsw' },
-  { id:'n3',  label:'Acro Yoga\nSydney', type:'nsw' },
-  { id:'n4',  label:'Blue Mtns Yoga\nTeachers', type:'nsw' },
-  { id:'n5',  label:'Central Coast\nYoga Community', type:'nsw' },
-  { id:'n6',  label:'Coffs Coast\nYoga Teachers', type:'nsw' },
-  { id:'n7',  label:'Milton Ulladulla\nYoga', type:'nsw' },
-  { id:'n8',  label:'South Coast\nYoga Teachers', type:'nsw' },
-  { id:'n9',  label:'Spiritual Living\nSydney–CC–Newcastle', type:'nsw' },
-  { id:'n10', label:'Sydney Wellness\nCoaching', type:'nsw' },
-  { id:'n11', label:'Sydney Yoga\nInstructors', type:'nsw' },
-  { id:'n12', label:'Sydney Yoga\nTeachers', type:'nsw' },
-  { id:'n13', label:'Thriving\nIllawarra', type:'nsw' },
-  { id:'n14', label:'Vegan Yogis\nNewcastle', type:'nsw' },
-  { id:'n15', label:'Wollongong\nWellness', type:'nsw' },
-  { id:'n16', label:'Wollongong\nYoga Teachers', type:'nsw' },
-  { id:'n17', label:'YOGA COLLECTIVE\nSydney–South Coast', type:'nsw' },
-  { id:'n18', label:'Yoga\nSydney', type:'nsw' },
-
-  // ── QLD ──
-  { id:'q1',  label:'Acroyoga\nByron Bay', type:'qld' },
-  { id:'q2',  label:'Brisbane Yoga\nCommunity', type:'qld' },
-  { id:'q3',  label:'Brisbane Yoga\nTeachers', type:'qld' },
-  { id:'q4',  label:'Byron Bay\n& QLD', type:'qld' },
-  { id:'q5',  label:'Byron Bay\nYoga Teachers', type:'qld' },
-  { id:'q6',  label:'Byron Bay\nYoga Tribe', type:'qld' },
-  { id:'q7',  label:'Gold Coast Yoga\nTeachers & Trainees', type:'qld' },
-  { id:'q8',  label:'Gold Coast Yoga\nTeachers', type:'qld' },
-  { id:'q9',  label:'Kundalini SE QLD', type:'qld' },
-  { id:'q10', label:'Noosa Yoga\nCommunity', type:'qld' },
-  { id:'q11', label:'Queensland Yoga\nGroup', type:'qld' },
-  { id:'q12', label:'Toowoomba Yoga\nCollective', type:'qld' },
-  { id:'q13', label:'Townsville Yoga\nTeachers', type:'qld' },
-
-  // ── VIC ──
-  { id:'v1', label:'AcroYoga\nMelbourne', type:'vic' },
-  { id:'v2', label:'Melbourne Yoga\nTeachers Unite', type:'vic' },
-  { id:'v3', label:'Melbourne Yoga\nTeachers', type:'vic' },
-  { id:'v4', label:'Mornington Pen.\nYoga Network', type:'vic' },
-  { id:'v5', label:'Mornington Pen.\nYoga Teachers', type:'vic' },
-
-  // ── Other States ──
-  { id:'o1',  label:'Adelaide Yoga\nTeacher Network', type:'other', region:'Adelaide', url:'https://facebook.com/groups/16186943' },
-  { id:'o2',  label:'Adelaide Yoga\nTeachers', type:'other', region:'Adelaide', url:'https://facebook.com/groups/15348915' },
-  { id:'o3',  label:'Awakening Divine\nFire AU', type:'other' },
-  { id:'o4',  label:'Canberra Yoga\nScene', type:'other' },
-  { id:'o5',  label:'Darwin Yoga\nCommunity', type:'other' },
-  { id:'o6',  label:'Darwin Yoga\nTeachers', type:'other' },
-  { id:'o7',  label:'Denmark AU\nYoga Community', type:'other' },
-  { id:'o8',  label:'Yoga in Mparntwe\nAlice Springs', type:'other', url:'https://facebook.com/groups/14586876' },
-  { id:'o9',  label:'Yoga Instructors\nCanberra', type:'other' },
-  { id:'o10', label:'Yoga Teachers\nDarwin', type:'other' },
-  { id:'o11', label:'Yoga Teachers\nPerth WA', type:'other' },
-];
-
-const links = [
-  // centre → hubs
-  ...['h-platform','h-general','h-nsw','h-qld','h-vic','h-other'].map(t=>({ source:'sa', target:t, strength:0.8 })),
-  // hubs → leaves
-  ...['p-bookretr','p-guru','p-tripaneer','p-mindtrip','p-ccg','p-deluxe','p-goodindex','p-tribu'].map(t=>({ source:'h-platform', target:t })),
-  ...['g1','g2','g3','g4','g5','g6','g7','g8','g9','g10','g11','g12','g13'].map(t=>({ source:'h-general', target:t })),
-  ...['n1','n2','n3','n4','n5','n6','n7','n8','n9','n10','n11','n12','n13','n14','n15','n16','n17','n18'].map(t=>({ source:'h-nsw', target:t })),
-  ...['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12','q13'].map(t=>({ source:'h-qld', target:t })),
-  ...['v1','v2','v3','v4','v5'].map(t=>({ source:'h-vic', target:t })),
-  ...['o1','o2','o3','o4','o5','o6','o7','o8','o9','o10','o11'].map(t=>({ source:'h-other', target:t })),
-];
-
-// Resolve CSS vars to hex for D3
-const cssVarCache = {};
-function cssVar(name){
-  if(cssVarCache[name]) return cssVarCache[name];
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  cssVarCache[name]=v; return v;
+// ─── DATA ────────────────────────────────────────────────
+async function loadNodes() {
+  const res = await fetch('/api/nodes');
+  allNodes = await res.json();
+  updateStats();
+  buildGraph();
 }
-const typeColor = {
-  soul:    ()=>cssVar('--soul'),
-  platform:()=>cssVar('--platform'),
-  general: ()=>cssVar('--general'),
-  nsw:     ()=>cssVar('--nsw'),
-  qld:     ()=>cssVar('--qld'),
-  vic:     ()=>cssVar('--vic'),
-  other:   ()=>cssVar('--other'),
-};
 
-// ── D3 graph ────────────────────────────────────────────────
-const svg = d3.select('#graph');
-let W = innerWidth, H = innerHeight;
+function updateStats() {
+  document.getElementById('stat-nodes').textContent = allNodes.length + 1;
+  document.getElementById('stat-platforms').textContent = allNodes.filter(n => n.category === 'platform').length;
+  document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category.startsWith('fb_')).length;
+}
 
-const g = svg.append('g');
+function filteredNodes() {
+  return allNodes.filter(n => {
+    const matchCat = activeFilter === 'all' || n.category === activeFilter;
+    const matchSearch = !searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchCat && matchSearch;
+  });
+}
 
-// zoom
-svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom', e=>{ g.attr('transform', e.transform); }));
+// ─── GRAPH ───────────────────────────────────────────────
+function buildGraph() {
+  const container = document.getElementById('graph-container');
+  const W = container.clientWidth, H = container.clientHeight;
 
-// simulation
-const sim = d3.forceSimulation(nodes)
-  .force('link', d3.forceLink(links).id(d=>d.id).distance(d=>{
-    if(d.source.id==='sa') return 160;
-    if(d.source.id&&d.source.id.startsWith('h-')) return 100;
-    return 80;
-  }).strength(d=>d.strength||0.5))
-  .force('charge', d3.forceManyBody().strength(d=> d.type==='soul'?-800 : d.hub?-500 : -150))
-  .force('center', d3.forceCenter(W/2, H/2))
-  .force('collision', d3.forceCollide().radius(d=> (d.r||9)+14));
+  d3.select('#graph').selectAll('*').remove();
+  svg = d3.select('#graph');
 
-// links
-const linkEl = g.append('g').attr('class','links')
-  .selectAll('line').data(links).join('line').attr('class','link');
+  // Zoom
+  const zoom = d3.zoom().scaleExtent([0.15, 4])
+    .on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoom);
 
-// nodes
-const node = g.append('g').attr('class','nodes')
-  .selectAll('g').data(nodes).join('g').attr('class','node')
-  .call(d3.drag()
-    .on('start',(e,d)=>{ if(!e.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
-    .on('drag', (e,d)=>{ d.fx=e.x; d.fy=e.y; })
-    .on('end',  (e,d)=>{ if(!e.active) sim.alphaTarget(0); d.fx=null; d.fy=null; })
-  );
+  g = svg.append('g');
 
-node.append('circle')
-  .attr('r', d=>d.r||9)
-  .attr('fill', d=>typeColor[d.type]())
-  .attr('fill-opacity', d=>d.type==='soul'?1:0.82)
-  .attr('stroke', d=>d.type==='soul'?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.12)')
-  .attr('stroke-width', d=>d.type==='soul'?2:1);
+  // Defs — glow filter
+  const defs = svg.append('defs');
+  const glow = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+  glow.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
+  const feMerge = glow.append('feMerge');
+  feMerge.append('feMergeNode').attr('in','blur');
+  feMerge.append('feMergeNode').attr('in','SourceGraphic');
 
-// glow filter
-const defs = svg.append('defs');
-const filter = defs.append('filter').attr('id','glow');
-filter.append('feGaussianBlur').attr('stdDeviation','3').attr('result','coloredBlur');
-const feMerge = filter.append('feMerge');
-feMerge.append('feMergeNode').attr('in','coloredBlur');
-feMerge.append('feMergeNode').attr('in','SourceGraphic');
+  const nodes_data = filteredNodes();
+  const center = { id: 'center', name: 'SoulAdventure', category: 'center', x: W/2, y: H/2, fx: W/2, fy: H/2 };
+  const all = [center, ...nodes_data.map(n => ({...n, id: String(n.id)}))];
+  const links = nodes_data.map(n => ({ source: 'center', target: String(n.id) }));
 
-node.filter(d=>d.type==='soul'||d.hub)
-  .select('circle').attr('filter','url(#glow)');
+  simulation = d3.forceSimulation(all)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.source.id === 'center' ? (d.target.category === 'platform' ? 160 : 220) : 80).strength(0.6))
+    .force('charge', d3.forceManyBody().strength(-180))
+    .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 12))
+    .force('x', d3.forceX(W/2).strength(0.04))
+    .force('y', d3.forceY(H/2).strength(0.04));
 
-// labels
-node.each(function(d){
-  const el = d3.select(this);
-  const lines = d.label.split('\n');
-  const r = d.r||9;
-  const yOff = r+12;
-  if(lines.length===1){
-    el.append('text').attr('y', yOff).text(lines[0]);
-  } else {
-    const txt = el.append('text');
-    lines.forEach((ln,i)=>{
-      txt.append('tspan').attr('x',0).attr('dy', i===0 ? yOff : '1.1em').text(ln);
-    });
-  }
-});
+  // Links
+  linkSel = g.append('g').selectAll('line')
+    .data(links).join('line')
+    .attr('stroke', d => {
+      const t = all.find(n => n.id === (d.target.id || d.target));
+      return t ? COLOR[t.category] || '#333' : '#333';
+    })
+    .attr('stroke-opacity', 0.18)
+    .attr('stroke-width', 1);
 
-// ── Tooltip & panel ─────────────────────────────────────────
-const tip = document.getElementById('tooltip');
+  // Nodes
+  const nodeG = g.append('g').selectAll('g')
+    .data(all).join('g')
+    .attr('class','node-g')
+    .style('cursor', d => d.id === 'center' ? 'default' : 'pointer')
+    .call(d3.drag()
+      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); if (d.id !== 'center') { d.fx = null; d.fy = null; } })
+    )
+    .on('click', (e, d) => { if (d.id !== 'center') { e.stopPropagation(); openPanel(d); } })
+    .on('mouseover', (e, d) => { if (d.id !== 'center') showTooltip(e, d); })
+    .on('mousemove', (e) => moveTooltip(e))
+    .on('mouseout', hideTooltip);
 
-node.on('mouseenter',(e,d)=>{
-  if(d.hub||d.type==='soul') return;
-  const tt = tip;
-  tt.querySelector('.tt-name').textContent = d.label.replace('\n',' ');
-  tt.querySelector('.tt-region').textContent = d.region||(d.type==='platform'?'Platform':'FB Group · '+(d.type.toUpperCase()));
-  tt.querySelector('.tt-link').textContent = d.url ? '↗ Open link' : '';
-  tt.style.opacity='1';
-})
-.on('mousemove',e=>{
-  tip.style.left=(e.clientX+14)+'px';
-  tip.style.top=(e.clientY-10)+'px';
-})
-.on('mouseleave',()=>{ tip.style.opacity='0'; })
-.on('click',(e,d)=>{
-  e.stopPropagation();
-  if(d.hub) return;
-  openPanel(d);
-});
+  // Outer ring for platforms/center
+  nodeG.filter(d => d.category === 'center' || d.category === 'platform')
+    .append('circle')
+    .attr('r', d => nodeRadius(d) + 7)
+    .attr('fill', 'none')
+    .attr('stroke', d => COLOR[d.category])
+    .attr('stroke-opacity', 0.2)
+    .attr('stroke-width', 1);
 
-svg.on('click',()=>closePanel());
+  nodeG.append('circle')
+    .attr('r', d => nodeRadius(d))
+    .attr('fill', d => COLOR[d.category] || '#555')
+    .attr('fill-opacity', d => d.category === 'center' ? 1 : 0.85)
+    .attr('filter', d => d.category === 'center' ? 'url(#glow)' : null);
 
-function openPanel(d){
-  const panel = document.getElementById('panel');
-  const content = document.getElementById('panel-content');
-  const color = typeColor[d.type]();
-  const typeLabel = {
-    soul:'SoulAdventure HQ', platform:'Retreat Platform',
-    general:'General / Niche FB Group', nsw:'NSW FB Group',
-    qld:'QLD FB Group', vic:'VIC FB Group', other:'Other States FB Group'
-  }[d.type]||d.type;
+  nodeG.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('dy', d => nodeRadius(d) + 14)
+    .attr('fill', d => COLOR[d.category])
+    .attr('font-size', d => d.category === 'center' ? 13 : (d.category === 'platform' ? 10 : 9))
+    .attr('font-family', d => d.category === 'center' ? "'Cormorant Garamond', serif" : "'DM Mono', monospace")
+    .attr('letter-spacing', '0.05em')
+    .text(d => truncate(d.name, d.category === 'center' ? 30 : 22))
+    .attr('pointer-events', 'none');
 
-  content.innerHTML = `
-    <h2>${d.label.replace(/\n/g,' ')}</h2>
-    <div class="p-badge" style="color:${color}">${typeLabel}</div>
-    ${d.desc?`<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">${d.desc}</p>`:''}
-    ${d.url?`<p><a href="${d.url}" target="_blank" rel="noopener">↗ Visit Page</a></p>`:''}
-    ${d.region?`<hr class="p-divider"><div class="p-section-title">Region</div><p>${d.region}</p>`:''}
-  `;
+  // Center icon
+  nodeG.filter(d => d.category === 'center')
+    .append('text')
+    .attr('text-anchor','middle').attr('dy','0.35em')
+    .attr('fill','#0a0d0f').attr('font-size','18px')
+    .text('🌿').attr('pointer-events','none');
+
+  simulation.on('tick', () => {
+    linkSel
+      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+
+  // Click outside panel
+  svg.on('click', closePanel);
+}
+
+function nodeRadius(d) {
+  if (d.category === 'center') return 30;
+  if (d.category === 'platform') return 14;
+  return 7;
+}
+
+function truncate(str, n) {
+  return str.length > n ? str.slice(0, n-1) + '…' : str;
+}
+
+// ─── TOOLTIP ─────────────────────────────────────────────
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e, d) {
+  tooltip.innerHTML = `<strong>${d.name}</strong>${d.url ? '<br><span style="color:var(--text-dim)">click to open</span>' : ''}`;
+  tooltip.style.opacity = 1;
+  moveTooltip(e);
+}
+function moveTooltip(e) {
+  tooltip.style.left = (e.clientX + 14) + 'px';
+  tooltip.style.top = (e.clientY - 10) + 'px';
+}
+function hideTooltip() { tooltip.style.opacity = 0; }
+
+// ─── PANEL ───────────────────────────────────────────────
+const panel = document.getElementById('panel');
+function openPanel(d) {
+  currentNode = d;
+  document.getElementById('panel-title').textContent = d.name;
+  document.getElementById('field-id').value = d.id || '';
+  document.getElementById('field-name').value = d.name || '';
+  document.getElementById('field-category').value = d.category || 'fb_general';
+  document.getElementById('field-url').value = d.url || '';
+  document.getElementById('field-members').value = d.members || '';
+  document.getElementById('field-notes').value = d.notes || '';
+  const link = document.getElementById('btn-link');
+  if (d.url) { link.href = d.url; link.style.display = 'flex'; }
+  else { link.style.display = 'none'; }
   panel.classList.add('open');
 }
+function openNewPanel() {
+  currentNode = null;
+  document.getElementById('panel-title').textContent = 'New Node';
+  document.getElementById('field-id').value = '';
+  document.getElementById('field-name').value = '';
+  document.getElementById('field-category').value = 'fb_general';
+  document.getElementById('field-url').value = '';
+  document.getElementById('field-members').value = '';
+  document.getElementById('field-notes').value = '';
+  document.getElementById('btn-link').style.display = 'none';
+  panel.classList.add('open');
+}
+function closePanel() { panel.classList.remove('open'); }
+document.getElementById('panel-close').addEventListener('click', closePanel);
 
-function closePanel(){
-  document.getElementById('panel').classList.remove('open');
+// ─── SAVE ─────────────────────────────────────────────────
+document.getElementById('btn-save').addEventListener('click', async () => {
+  const id = document.getElementById('field-id').value;
+  const payload = {
+    name: document.getElementById('field-name').value,
+    category: document.getElementById('field-category').value,
+    url: document.getElementById('field-url').value,
+    members: document.getElementById('field-members').value,
+    notes: document.getElementById('field-notes').value,
+  };
+  if (!payload.name) { showToast('Name is required'); return; }
+  if (id) {
+    const res = await fetch(`/api/nodes/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const updated = await res.json();
+    allNodes = allNodes.map(n => n.id == id ? updated : n);
+    showToast('Saved ✓');
+  } else {
+    const res = await fetch('/api/nodes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    const created = await res.json();
+    allNodes.push(created);
+    showToast('Added ✓');
+  }
+  closePanel();
+  updateStats();
+  buildGraph();
+});
+
+// ─── DELETE ───────────────────────────────────────────────
+document.getElementById('btn-delete').addEventListener('click', async () => {
+  const id = document.getElementById('field-id').value;
+  if (!id) { closePanel(); return; }
+  if (!confirm('Delete this node?')) return;
+  await fetch(`/api/nodes/${id}`, { method:'DELETE' });
+  allNodes = allNodes.filter(n => n.id != id);
+  closePanel();
+  updateStats();
+  buildGraph();
+  showToast('Deleted');
+});
+
+// ─── ADD BTN ──────────────────────────────────────────────
+document.getElementById('add-btn').addEventListener('click', e => { e.stopPropagation(); openNewPanel(); });
+
+// ─── SEARCH ───────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', e => {
+  searchTerm = e.target.value;
+  buildGraph();
+});
+document.getElementById('search-clear').addEventListener('click', () => {
+  searchTerm = '';
+  document.getElementById('search-input').value = '';
+  buildGraph();
+});
+
+// ─── FILTERS ──────────────────────────────────────────────
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeFilter = pill.dataset.cat;
+    buildGraph();
+  });
+});
+
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ── Simulation tick ──────────────────────────────────────────
-sim.on('tick',()=>{
-  linkEl
-    .attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
-    .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-  node.attr('transform',d=>`translate(${d.x},${d.y})`);
-});
+// ─── RESIZE ───────────────────────────────────────────────
+window.addEventListener('resize', () => buildGraph());
 
-// Resize
-window.addEventListener('resize',()=>{
-  W=innerWidth; H=innerHeight;
-  sim.force('center', d3.forceCenter(W/2,H/2)).alpha(0.3).restart();
-});
+// ─── INIT ─────────────────────────────────────────────────
+loadNodes();
 </script>
 </body>
 </html>
