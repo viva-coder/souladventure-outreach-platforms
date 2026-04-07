@@ -19,7 +19,7 @@ def get_db():
     return psycopg2.connect(url, cursor_factory=RealDictCursor)
 
 def sync_vault():
-    """Scans the local folder structure and updates Postgres."""
+    """Scans the folder structure and updates Postgres with smart matching."""
     conn = get_db()
     cur = conn.cursor()
     
@@ -32,37 +32,42 @@ def sync_vault():
         );
     """)
 
-    # This matches your actual folder names
-    categories = {
+    # We map potential folder names to clear Categories
+    mapping = {
         '01_FB_Groups/NSW': 'NSW',
+        '01_FB_Groups/nsw': 'NSW',
         '01_FB_Groups/QLD': 'QLD',
+        '01_FB_Groups/qld': 'QLD',
         '01_FB_Groups/VIC': 'VIC',
+        '01_FB_Groups/vic': 'VIC',
         '01_FB_Groups/General_and_Niche': 'General',
         '01_FB_Groups/Other_States': 'Other',
-        '02_Platforms': 'Platform'
+        '02_Platforms': 'Platform',
+        '02_platforms': 'Platform'
     }
 
-    # Use "." because your folders are in the root directory
-    vault_base = "." 
+    print("--- Starting Smart Vault Sync ---")
     
-    print("--- Starting Vault Sync ---")
-    
-    for folder_rel, cat_label in categories.items():
-        folder_path = os.path.join(vault_base, folder_rel)
-        if os.path.exists(folder_path):
-            print(f"Checking folder: {folder_path}")
-            for filename in os.listdir(folder_path):
+    for folder_rel, cat_label in mapping.items():
+        if os.path.exists(folder_rel):
+            print(f"Found folder: {folder_rel}")
+            for filename in os.listdir(folder_rel):
                 if filename.endswith(".md"):
                     node_name = filename.replace(".md", "")
-                    logo_file = f"{node_name}.jpg" 
                     
+                    # Smart Logo Search: Looks for "Name.jpg" or "Namelogo.jpg"
+                    logo_file = f"{node_name}.jpg"
+                    if not os.path.exists(f"static/{logo_file}"):
+                        alt_logo = f"{node_name}logo.jpg".replace(" ", "")
+                        logo_file = alt_logo if os.path.exists(f"static/{alt_logo}") else logo_file
+
                     cur.execute("""
                         INSERT INTO nodes (name, category, logo_path)
                         VALUES (%s, %s, %s)
                         ON CONFLICT (name) 
                         DO UPDATE SET category = EXCLUDED.category, logo_path = EXCLUDED.logo_path;
                     """, (node_name, cat_label, logo_file))
-                    print(f"  Added/Updated: {node_name}")
+                    print(f"  Synced: {node_name}")
     
     conn.commit()
     cur.close()
