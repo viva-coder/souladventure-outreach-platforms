@@ -59,7 +59,8 @@
     width: 100%; height: 100%;
     background: radial-gradient(ellipse at 30% 40%, #0d1a14 0%, #0a0d0f 60%);
   }
-  svg { width: 100%; height: 100%; }
+  svg { width: 100%; height: 100%; cursor: grab; }
+  svg:active { cursor: grabbing; }
 
   /* SEARCH BAR */
   #search-bar {
@@ -153,7 +154,6 @@
   .panel-field input:focus, .panel-field select:focus, .panel-field textarea:focus {
     border-color: var(--gold-dim);
   }
-  .panel-field select option { background: var(--bg3); }
   #panel-footer {
     padding: 20px 24px; border-top: 1px solid var(--border);
     display: flex; gap: 10px;
@@ -173,52 +173,24 @@
     text-decoration: none; display: flex; align-items: center; justify-content: center;
     flex: none; padding: 11px 16px;
   }
-  .btn-link:hover { border-color: var(--teal); background: rgba(77,184,158,0.08); }
 
-  /* ADD NODE BUTTON */
+  /* ADD BUTTON */
   #add-btn {
     position: fixed; bottom: 24px; right: 24px; z-index: 100;
     width: 48px; height: 48px; border-radius: 50%;
     background: var(--gold); color: #0a0d0f;
-    border: none; cursor: pointer; font-size: 22px; line-height: 1;
+    border: none; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 4px 20px rgba(201,169,110,0.35);
-    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-  }
-  #add-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(201,169,110,0.5); }
-
-  /* TOOLTIP */
-  #tooltip {
-    position: fixed; z-index: 300; pointer-events: none;
-    background: var(--bg2); border: 1px solid var(--border);
-    padding: 8px 14px; border-radius: 2px;
-    font-size: 11px; color: var(--text);
-    opacity: 0; transition: opacity 0.15s;
-    max-width: 220px; white-space: nowrap;
   }
 
-  /* TOAST */
-  #toast {
-    position: fixed; bottom: 80px; right: 24px; z-index: 400;
-    background: var(--bg2); border: 1px solid var(--border);
-    padding: 12px 20px; border-radius: 2px;
-    font-size: 11px; color: var(--text-bright);
-    transform: translateY(20px); opacity: 0;
-    transition: all 0.3s; pointer-events: none;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* Grid bg lines */
-  .grid-line { stroke: #131a1f; stroke-width: 1; }
+  /* TOOLTIP & TOAST */
+  #tooltip { position: fixed; z-index: 300; pointer-events: none; background: var(--bg2); border: 1px solid var(--border); padding: 8px 14px; opacity: 0; font-size: 11px; transition: opacity 0.15s; }
+  #toast { position: fixed; bottom: 80px; right: 24px; z-index: 400; background: var(--bg2); border: 1px solid var(--border); padding: 12px 20px; opacity: 0; font-size: 11px; transition: all 0.3s; pointer-events: none; }
+  #toast.show { opacity: 1; transform: translateY(-10px); }
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div id="header">
   <div>
     <div class="logo">Soul<span>Adventure</span></div>
@@ -226,29 +198,18 @@
   </div>
   <div class="spacer"></div>
   <div id="stats">
-    <div class="stat">
-      <div class="stat-val" id="stat-nodes">—</div>
-      <div class="stat-label">Nodes</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-platforms">—</div>
-      <div class="stat-label">Platforms</div>
-    </div>
-    <div class="stat">
-      <div class="stat-val" id="stat-groups">—</div>
-      <div class="stat-label">FB Groups</div>
-    </div>
+    <div class="stat"><div class="stat-val" id="stat-nodes">—</div><div class="stat-label">Nodes</div></div>
+    <div class="stat"><div class="stat-val" id="stat-platforms">—</div><div class="stat-label">Platforms</div></div>
+    <div class="stat"><div class="stat-val" id="stat-groups">—</div><div class="stat-label">FB Groups</div></div>
   </div>
 </div>
 
-<!-- Search -->
 <div id="search-bar">
   <div id="search-icon">⌕</div>
   <input id="search-input" type="text" placeholder="Search nodes…" autocomplete="off"/>
   <div id="search-clear">×</div>
 </div>
 
-<!-- Filter pills -->
 <div id="filters">
   <div class="pill active" data-cat="all">All</div>
   <div class="pill" data-cat="platform">Platforms</div>
@@ -259,34 +220,23 @@
   <div class="pill" data-cat="fb_other">Other States</div>
 </div>
 
-<!-- Graph -->
-<div id="graph-container">
-  <svg id="graph"></svg>
-</div>
+<div id="graph-container"><svg id="graph"></svg></div>
 
-<!-- Legend -->
 <div id="legend">
   <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>SoulAdventure HQ</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--teal)"></div>Platforms</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--lime)"></div>General / Niche</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--lime)"></div>General</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--rose)"></div>NSW</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>QLD</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--lavender)"></div>VIC</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div>Other States</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--sky)"></div>Other</div>
 </div>
 
-<!-- Side Panel -->
 <div id="panel">
-  <div id="panel-header">
-    <div id="panel-title">Node</div>
-    <div id="panel-close">×</div>
-  </div>
+  <div id="panel-header"><div id="panel-title">Node</div><div id="panel-close">×</div></div>
   <div id="panel-body">
     <input type="hidden" id="field-id"/>
-    <div class="panel-field">
-      <label>Name</label>
-      <input type="text" id="field-name" placeholder="Group or platform name"/>
-    </div>
+    <div class="panel-field"><label>Name</label><input type="text" id="field-name"/></div>
     <div class="panel-field">
       <label>Category</label>
       <select id="field-category">
@@ -295,61 +245,35 @@
         <option value="fb_nsw">FB Group — NSW</option>
         <option value="fb_qld">FB Group — QLD</option>
         <option value="fb_vic">FB Group — VIC</option>
-        <option value="fb_other">FB Group — Other States</option>
+        <option value="fb_other">FB Group — Other</option>
       </select>
     </div>
-    <div class="panel-field">
-      <label>URL / Link</label>
-      <input type="url" id="field-url" placeholder="https://…"/>
-    </div>
-    <div class="panel-field">
-      <label>Members</label>
-      <input type="text" id="field-members" placeholder="e.g. 4,200"/>
-    </div>
-    <div class="panel-field">
-      <label>Notes</label>
-      <textarea id="field-notes" rows="4" placeholder="Status, contact, outreach notes…"></textarea>
-    </div>
+    <div class="panel-field"><label>URL</label><input type="url" id="field-url"/></div>
+    <div class="panel-field"><label>Members</label><input type="text" id="field-members"/></div>
+    <div class="panel-field"><label>Notes</label><textarea id="field-notes" rows="4"></textarea></div>
   </div>
   <div id="panel-footer">
     <button class="btn btn-primary" id="btn-save">Save</button>
-    <a class="btn btn-link" id="btn-link" href="#" target="_blank" rel="noopener">↗</a>
+    <a class="btn btn-link" id="btn-link" href="#" target="_blank">↗</a>
     <button class="btn btn-danger" id="btn-delete">Delete</button>
   </div>
 </div>
 
-<!-- Add button -->
-<button id="add-btn" title="Add new node">+</button>
-
-<!-- Tooltip -->
+<button id="add-btn">+</button>
 <div id="tooltip"></div>
-
-<!-- Toast -->
 <div id="toast"></div>
 
 <script>
-const COLOR = {
-  center:     '#c9a96e',
-  platform:   '#4db89e',
-  fb_general: '#7db87a',
-  fb_nsw:     '#d4748a',
-  fb_qld:     '#d4a04a',
-  fb_vic:     '#9b7fd4',
-  fb_other:   '#5aaccf',
-};
+const COLOR = { center: '#c9a96e', platform: '#4db89e', fb_general: '#7db87a', fb_nsw: '#d4748a', fb_qld: '#d4a04a', fb_vic: '#9b7fd4', fb_other: '#5aaccf' };
+let allNodes = [], simulation, svg, g, linkSel, nodeSel, activeFilter = 'all', searchTerm = '';
 
-let allNodes = [];
-let simulation, svg, g, linkSel, nodeSel;
-let activeFilter = 'all';
-let searchTerm = '';
-let currentNode = null;
-
-// ─── DATA ────────────────────────────────────────────────
 async function loadNodes() {
-  const res = await fetch('/api/nodes');
-  allNodes = await res.json();
-  updateStats();
-  buildGraph();
+  try {
+    const res = await fetch('/api/nodes');
+    allNodes = await res.json();
+    updateStats();
+    buildGraph();
+  } catch (err) { console.error(err); }
 }
 
 function updateStats() {
@@ -358,247 +282,99 @@ function updateStats() {
   document.getElementById('stat-groups').textContent = allNodes.filter(n => n.category.startsWith('fb_')).length;
 }
 
-function filteredNodes() {
-  return allNodes.filter(n => {
-    const matchCat = activeFilter === 'all' || n.category === activeFilter;
-    const matchSearch = !searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchCat && matchSearch;
-  });
-}
-
-// ─── GRAPH ───────────────────────────────────────────────
 function buildGraph() {
   const container = document.getElementById('graph-container');
   const W = container.clientWidth, H = container.clientHeight;
-
   d3.select('#graph').selectAll('*').remove();
   svg = d3.select('#graph');
-
-  // Zoom
-  const zoom = d3.zoom().scaleExtent([0.15, 4])
-    .on('zoom', e => g.attr('transform', e.transform));
+  const zoom = d3.zoom().scaleExtent([0.1, 4]).on('zoom', e => g.attr('transform', e.transform));
   svg.call(zoom);
-
   g = svg.append('g');
 
-  // Defs — glow filter
-  const defs = svg.append('defs');
-  const glow = defs.append('filter').attr('id','glow').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
-  glow.append('feGaussianBlur').attr('stdDeviation','4').attr('result','blur');
-  const feMerge = glow.append('feMerge');
-  feMerge.append('feMergeNode').attr('in','blur');
-  feMerge.append('feMergeNode').attr('in','SourceGraphic');
-
-  const nodes_data = filteredNodes();
+  const filtered = allNodes.filter(n => (activeFilter === 'all' || n.category === activeFilter) && (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase())));
   const center = { id: 'center', name: 'SoulAdventure', category: 'center', x: W/2, y: H/2, fx: W/2, fy: H/2 };
-  const all = [center, ...nodes_data.map(n => ({...n, id: String(n.id)}))];
-  const links = nodes_data.map(n => ({ source: 'center', target: String(n.id) }));
+  const nodes = [center, ...filtered.map(n => ({...n, id: String(n.id)}))];
+  const links = filtered.map(n => ({ source: 'center', target: String(n.id) }));
 
-  simulation = d3.forceSimulation(all)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(d => d.source.id === 'center' ? (d.target.category === 'platform' ? 160 : 220) : 80).strength(0.6))
-    .force('charge', d3.forceManyBody().strength(-180))
-    .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 12))
-    .force('x', d3.forceX(W/2).strength(0.04))
-    .force('y', d3.forceY(H/2).strength(0.04));
+  simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(180))
+    .force('charge', d3.forceManyBody().strength(-200))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('collision', d3.forceCollide().radius(40));
 
-  // Links
-  linkSel = g.append('g').selectAll('line')
-    .data(links).join('line')
-    .attr('stroke', d => {
-      const t = all.find(n => n.id === (d.target.id || d.target));
-      return t ? COLOR[t.category] || '#333' : '#333';
-    })
-    .attr('stroke-opacity', 0.18)
-    .attr('stroke-width', 1);
-
-  // Nodes
-  const nodeG = g.append('g').selectAll('g')
-    .data(all).join('g')
-    .attr('class','node-g')
-    .style('cursor', d => d.id === 'center' ? 'default' : 'pointer')
-    .call(d3.drag()
-      .on('start', (e, d) => { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
-      .on('drag', (e, d) => { d.fx = e.x; d.fy = e.y; })
-      .on('end', (e, d) => { if (!e.active) simulation.alphaTarget(0); if (d.id !== 'center') { d.fx = null; d.fy = null; } })
-    )
-    .on('click', (e, d) => { if (d.id !== 'center') { e.stopPropagation(); openPanel(d); } })
-    .on('mouseover', (e, d) => { if (d.id !== 'center') showTooltip(e, d); })
-    .on('mousemove', (e) => moveTooltip(e))
+  linkSel = g.append('g').selectAll('line').data(links).join('line').attr('stroke', '#1e2830').attr('stroke-width', 1);
+  
+  const nodeG = g.append('g').selectAll('g').data(nodes).join('g')
+    .call(d3.drag().on('start', dragStarted).on('drag', dragged).on('end', dragEnded))
+    .on('click', (e, d) => { if(d.id !== 'center') openPanel(d); })
+    .on('mouseover', (e, d) => { if(d.id !== 'center') showTooltip(e, d); })
     .on('mouseout', hideTooltip);
 
-  // Outer ring for platforms/center
-  nodeG.filter(d => d.category === 'center' || d.category === 'platform')
-    .append('circle')
-    .attr('r', d => nodeRadius(d) + 7)
-    .attr('fill', 'none')
-    .attr('stroke', d => COLOR[d.category])
-    .attr('stroke-opacity', 0.2)
-    .attr('stroke-width', 1);
-
-  nodeG.append('circle')
-    .attr('r', d => nodeRadius(d))
-    .attr('fill', d => COLOR[d.category] || '#555')
-    .attr('fill-opacity', d => d.category === 'center' ? 1 : 0.85)
-    .attr('filter', d => d.category === 'center' ? 'url(#glow)' : null);
-
-  nodeG.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('dy', d => nodeRadius(d) + 14)
-    .attr('fill', d => COLOR[d.category])
-    .attr('font-size', d => d.category === 'center' ? 13 : (d.category === 'platform' ? 10 : 9))
-    .attr('font-family', d => d.category === 'center' ? "'Cormorant Garamond', serif" : "'DM Mono', monospace")
-    .attr('letter-spacing', '0.05em')
-    .text(d => truncate(d.name, d.category === 'center' ? 30 : 22))
-    .attr('pointer-events', 'none');
-
-  // Center icon
-  nodeG.filter(d => d.category === 'center')
-    .append('text')
-    .attr('text-anchor','middle').attr('dy','0.35em')
-    .attr('fill','#0a0d0f').attr('font-size','18px')
-    .text('🌿').attr('pointer-events','none');
+  nodeG.append('circle').attr('r', d => d.id === 'center' ? 30 : 8).attr('fill', d => COLOR[d.category]);
+  nodeG.append('text').attr('dy', 25).attr('text-anchor', 'middle').attr('fill', d => COLOR[d.category]).text(d => d.name).style('font-size', '10px');
 
   simulation.on('tick', () => {
-    linkSel
-      .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
     nodeG.attr('transform', d => `translate(${d.x},${d.y})`);
   });
-
-  // Click outside panel
-  svg.on('click', closePanel);
 }
 
-function nodeRadius(d) {
-  if (d.category === 'center') return 30;
-  if (d.category === 'platform') return 14;
-  return 7;
-}
-
-function truncate(str, n) {
-  return str.length > n ? str.slice(0, n-1) + '…' : str;
-}
-
-// ─── TOOLTIP ─────────────────────────────────────────────
-const tooltip = document.getElementById('tooltip');
-function showTooltip(e, d) {
-  tooltip.innerHTML = `<strong>${d.name}</strong>${d.url ? '<br><span style="color:var(--text-dim)">click to open</span>' : ''}`;
-  tooltip.style.opacity = 1;
-  moveTooltip(e);
-}
-function moveTooltip(e) {
-  tooltip.style.left = (e.clientX + 14) + 'px';
-  tooltip.style.top = (e.clientY - 10) + 'px';
-}
-function hideTooltip() { tooltip.style.opacity = 0; }
-
-// ─── PANEL ───────────────────────────────────────────────
-const panel = document.getElementById('panel');
 function openPanel(d) {
-  currentNode = d;
   document.getElementById('panel-title').textContent = d.name;
-  document.getElementById('field-id').value = d.id || '';
-  document.getElementById('field-name').value = d.name || '';
-  document.getElementById('field-category').value = d.category || 'fb_general';
+  document.getElementById('field-id').value = d.id;
+  document.getElementById('field-name').value = d.name;
+  document.getElementById('field-category').value = d.category;
   document.getElementById('field-url').value = d.url || '';
   document.getElementById('field-members').value = d.members || '';
   document.getElementById('field-notes').value = d.notes || '';
-  const link = document.getElementById('btn-link');
-  if (d.url) { link.href = d.url; link.style.display = 'flex'; }
-  else { link.style.display = 'none'; }
-  panel.classList.add('open');
+  document.getElementById('panel').classList.add('open');
 }
-function openNewPanel() {
-  currentNode = null;
-  document.getElementById('panel-title').textContent = 'New Node';
-  document.getElementById('field-id').value = '';
-  document.getElementById('field-name').value = '';
-  document.getElementById('field-category').value = 'fb_general';
-  document.getElementById('field-url').value = '';
-  document.getElementById('field-members').value = '';
-  document.getElementById('field-notes').value = '';
-  document.getElementById('btn-link').style.display = 'none';
-  panel.classList.add('open');
-}
-function closePanel() { panel.classList.remove('open'); }
-document.getElementById('panel-close').addEventListener('click', closePanel);
 
-// ─── SAVE ─────────────────────────────────────────────────
-document.getElementById('btn-save').addEventListener('click', async () => {
+document.getElementById('btn-save').onclick = async () => {
   const id = document.getElementById('field-id').value;
   const payload = {
     name: document.getElementById('field-name').value,
     category: document.getElementById('field-category').value,
     url: document.getElementById('field-url').value,
     members: document.getElementById('field-members').value,
-    notes: document.getElementById('field-notes').value,
+    notes: document.getElementById('field-notes').value
   };
-  if (!payload.name) { showToast('Name is required'); return; }
-  if (id) {
-    const res = await fetch(`/api/nodes/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const updated = await res.json();
-    allNodes = allNodes.map(n => n.id == id ? updated : n);
-    showToast('Saved ✓');
-  } else {
-    const res = await fetch('/api/nodes', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const created = await res.json();
-    allNodes.push(created);
-    showToast('Added ✓');
-  }
-  closePanel();
-  updateStats();
-  buildGraph();
-});
+  const method = id && id !== 'undefined' ? 'PUT' : 'POST';
+  const url = id && id !== 'undefined' ? `/api/nodes/${id}` : '/api/nodes';
+  await fetch(url, { method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+  document.getElementById('panel').classList.remove('open');
+  loadNodes();
+};
 
-// ─── DELETE ───────────────────────────────────────────────
-document.getElementById('btn-delete').addEventListener('click', async () => {
+document.getElementById('btn-delete').onclick = async () => {
   const id = document.getElementById('field-id').value;
-  if (!id) { closePanel(); return; }
-  if (!confirm('Delete this node?')) return;
-  await fetch(`/api/nodes/${id}`, { method:'DELETE' });
-  allNodes = allNodes.filter(n => n.id != id);
-  closePanel();
-  updateStats();
-  buildGraph();
-  showToast('Deleted');
+  if(confirm('Delete?')) {
+    await fetch(`/api/nodes/${id}`, { method: 'DELETE' });
+    document.getElementById('panel').classList.remove('open');
+    loadNodes();
+  }
+};
+
+document.getElementById('add-btn').onclick = () => {
+  document.getElementById('field-id').value = '';
+  document.getElementById('field-name').value = '';
+  document.getElementById('panel-title').textContent = 'New Node';
+  document.getElementById('panel').classList.add('open');
+};
+
+document.getElementById('search-input').oninput = e => { searchTerm = e.target.value; buildGraph(); };
+document.getElementById('panel-close').onclick = () => document.getElementById('panel').classList.remove('open');
+document.querySelectorAll('.pill').forEach(p => p.onclick = () => { 
+  document.querySelectorAll('.pill').forEach(pill => pill.classList.remove('active'));
+  p.classList.add('active'); activeFilter = p.dataset.cat; buildGraph(); 
 });
 
-// ─── ADD BTN ──────────────────────────────────────────────
-document.getElementById('add-btn').addEventListener('click', e => { e.stopPropagation(); openNewPanel(); });
+function dragStarted(e, d) { if (!e.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; }
+function dragged(e, d) { d.fx = e.x; d.fy = e.y; }
+function dragEnded(e, d) { if (!e.active) simulation.alphaTarget(0); if (d.id !== 'center') { d.fx = null; d.fy = null; } }
+function showTooltip(e, d) { const t = document.getElementById('tooltip'); t.innerHTML = d.name; t.style.opacity = 1; t.style.left = e.pageX + 'px'; t.style.top = e.pageY + 'px'; }
+function hideTooltip() { document.getElementById('tooltip').style.opacity = 0; }
 
-// ─── SEARCH ───────────────────────────────────────────────
-document.getElementById('search-input').addEventListener('input', e => {
-  searchTerm = e.target.value;
-  buildGraph();
-});
-document.getElementById('search-clear').addEventListener('click', () => {
-  searchTerm = '';
-  document.getElementById('search-input').value = '';
-  buildGraph();
-});
-
-// ─── FILTERS ──────────────────────────────────────────────
-document.querySelectorAll('.pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    activeFilter = pill.dataset.cat;
-    buildGraph();
-  });
-});
-
-// ─── TOAST ────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ─── RESIZE ───────────────────────────────────────────────
-window.addEventListener('resize', () => buildGraph());
-
-// ─── INIT ─────────────────────────────────────────────────
 loadNodes();
 </script>
 </body>
