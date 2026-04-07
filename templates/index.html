@@ -314,14 +314,15 @@ function buildGraph() {
 
   // KEY FIX: Convert categories to uppercase to match the filter buttons exactly
   const filtered = allNodes.filter(n => {
-    // 1. Clean both strings: Remove spaces and make them LOWERCASE
+    // This turns "NSW", "nsw", "02_Platforms", and "platform" 
+    // all into lowercase so they match no matter what.
     const nodeCat = String(n.category || '').trim().toLowerCase();
     const filterCat = String(activeFilter || '').trim().toLowerCase();
     
-    // 2. Logic: Match if 'all' is selected OR the strings match exactly
+    // Match if 'all' is selected OR if the names match perfectly in lowercase
     const catMatch = (filterCat === 'all' || nodeCat === filterCat);
     
-    // 3. Search bar logic
+    // Search bar logic
     const searchMatch = (!searchTerm || n.name.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return catMatch && searchMatch;
