@@ -35,11 +35,11 @@ def sync_vault():
 
     # Mapping local folders to your HTML categories
     paths = {
-        '01_fb_groups/nsw': 'fb_nsw',
-        '01_fb_groups/qld': 'fb_qld',
-        '01_fb_groups/vic': 'fb_vic',
-        '01_fb_groups/general-and_niche': 'fb_general', # Fixed path
-        '01_fb_groups/other_states': 'fb_other',          # Fixed path (with your typo)
+        '01_fb_groups/nsw': 'nsw',
+        '01_fb_groups/qld': 'qld',
+        '01_fb_groups/vic': 'vic',
+        '01_fb_groups/general-and_niche': 'general', # Fixed path
+        '01_fb_groups/other_states': 'other',          # Fixed path (with your typo)
         '02_plaforms': 'platform'
     }
 
