@@ -38,9 +38,9 @@ def sync_vault():
         '01_fb_groups/nsw': 'fb_nsw',
         '01_fb_groups/qld': 'fb_qld',
         '01_fb_groups/vic': 'fb_vic',
-        '01_fb_groups/general': 'fb_general',
-        '01_fb_groups/other': 'fb_other',
-        '02_platforms': 'platform'
+        '01_fb_groups/general-and_niche': 'fb_general', # Fixed path
+        '01_fb_groups/other_states': 'fb_other',          # Fixed path (with your typo)
+        '02_plaforms': 'platform'
     }
 
     for path, cat_label in paths.items():
